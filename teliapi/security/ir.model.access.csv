@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_teliapi_teliapi,teliapi.teliapi,model_teliapi_teliapi,,1,0,0,0
+access_teliapi_teliapi,access_teliapi_teliapi,model_teliapi_teliapi,base.group_user,1,0,0,0

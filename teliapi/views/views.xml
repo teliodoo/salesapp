@@ -1,48 +1,48 @@
 <odoo>
   <data>
     <!-- explicit list view definition -->
-    <record model="ir.ui.view" id="teliapi.list">
-      <field name="name">teliapi list</field>
-      <field name="model">teliapi.teliapi</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
+    <!-- <record model="ir.ui.view" id="teliapi.list"> -->
+      <!-- <field name="name">teliapi list</field> -->
+      <!-- <field name="model">teliapi.teliapi</field> -->
+      <!-- <field name="arch" type="xml"> -->
+        <!-- <tree> -->
+          <!-- <field name="name"/> -->
+          <!-- <field name="value"/> -->
+          <!-- <field name="value2"/> -->
+        <!-- </tree> -->
+      <!-- </field> -->
+    <!-- </record> -->
 
     <!-- actions opening views on models -->
-    <record model="ir.actions.act_window" id="teliapi.action_window">
-      <field name="name">teliapi window</field>
-      <field name="res_model">teliapi.teliapi</field>
-      <field name="view_mode">tree,form</field>
-    </record>
+    <!-- <record model="ir.actions.act_window" id="teliapi.action_window"> -->
+      <!-- <field name="name">teliapi window</field> -->
+      <!-- <field name="res_model">teliapi.teliapi</field> -->
+      <!-- <field name="view_mode">tree,form</field> -->
+    <!-- </record> -->
 
     <!-- server action to the one above -->
-    <record model="ir.actions.server" id="teliapi.action_server">
-      <field name="name">teliapi server</field>
-      <field name="model_id" ref="model_teliapi_teliapi"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
+    <!-- <record model="ir.actions.server" id="teliapi.action_server"> -->
+      <!-- <field name="name">teliapi server</field> -->
+      <!-- <field name="model_id" ref="model_teliapi_teliapi"/> -->
+      <!-- <field name="state">code</field> -->
+      <!-- <field name="code"> -->
+        <!-- action = { -->
+          <!-- "type": "ir.actions.act_window", -->
+          <!-- "view_mode": "tree,form", -->
+          <!-- "res_model": self._name, -->
+        <!-- } -->
+      <!-- </field> -->
+    <!-- </record> -->
 
     <!-- Top menu item -->
-    <menuitem name="Teliapi" id="teliapi.menu_root"/>
+    <!-- <menuitem name="Teliapi" id="teliapi.menu_root"/> -->
     <!-- menu categories -->
-    <menuitem name="Menu 1" id="teliapi.menu_1" parent="teliapi.menu_root"/>
-    <menuitem name="Menu 2" id="teliapi.menu_2" parent="teliapi.menu_root"/>
+    <!-- <menuitem name="Menu 1" id="teliapi.menu_1" parent="teliapi.menu_root"/> -->
+    <!-- <menuitem name="Menu 2" id="teliapi.menu_2" parent="teliapi.menu_root"/> -->
     <!-- actions -->
-    <menuitem name="List" id="teliapi.menu_1_list" parent="teliapi.menu_1"
-              action="teliapi.action_window"/>
-    <menuitem name="Server to list" id="teliapi" parent="teliapi.menu_2"
-              action="teliapi.action_server"/>
+    <!-- <menuitem name="List" id="teliapi.menu_1_list" parent="teliapi.menu_1" -->
+              <!-- action="teliapi.action_window"/> -->
+    <!-- <menuitem name="Server to list" id="teliapi" parent="teliapi.menu_2" -->
+              <!-- action="teliapi.action_server"/> -->
   </data>
 </odoo>

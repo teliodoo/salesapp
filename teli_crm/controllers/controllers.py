@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 
-# class TeliCrm(http.Controller):
-#     @http.route('/teli_crm/teli_crm/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+class TeliCrm(http.Controller):
+    @http.route('/teli_crm/teli_crm/', auth='public')
+    def index(self, **kw):
+        return "Hello, world"
 
 #     @http.route('/teli_crm/teli_crm/objects/', auth='public')
 #     def list(self, **kw):
