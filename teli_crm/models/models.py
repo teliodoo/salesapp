@@ -10,11 +10,11 @@ class teli_crm(models.Model):
     _inherit = 'crm.lead'
 
     # Override fields we want to be required for account creation
-    contact_name = fields.Char('Contact Name', required=True)
-    email_from = fields.Char('Email', help="Email address of the contact", index=True, required=True)
-    partner_name = fields.Char("Customer Name", index=True, required=True,
-        help='The name of the future partner company that will be created while converting the lead into opportunity')
-    phone = fields.Char('Phone', required=True)
+    # contact_name = fields.Char('Contact Name', required=True)
+    # email_from = fields.Char('Email', help="Email address of the contact", index=True, required=True)
+    # partner_name = fields.Char("Customer Name", index=True, required=True,
+        # help='The name of the future partner company that will be created while converting the lead into opportunity')
+    # phone = fields.Char('Phone', required=True)
 
     # TODO Add a username field?
     # username =  fields.Char('Teli Username', required=True, help='Provide the username you want to assign to the lead')
