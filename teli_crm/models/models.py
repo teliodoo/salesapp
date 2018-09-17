@@ -4,7 +4,8 @@ from odoo import models, fields, api
 import logging
 
 _logger = logging.getLogger(__name__)
-_logger.setLevel('DEBUG')
+# uncomment for debugging
+# _logger.setLevel('DEBUG')
 
 class teli_crm(models.Model):
     _inherit = 'crm.lead'
@@ -16,8 +17,8 @@ class teli_crm(models.Model):
         # help='The name of the future partner company that will be created while converting the lead into opportunity')
     # phone = fields.Char('Phone', required=True)
 
-    # TODO Add a username field?
-    # username =  fields.Char('Teli Username', required=True, help='Provide the username you want to assign to the lead')
+    username = fields.Char('Username', required=True, help='Provide the username you want to assign to the lead')
+    account_credit = fields.Char('Initial Account Credit', default='25')
 
     def _format_phone_number(self, phone_number):
         """ _format_phone_number - Attempts to print a phone number in a more
@@ -55,43 +56,33 @@ class teli_crm(models.Model):
             return first_name, last_name
 
     @api.multi
-    def _convert_opportunity_data(self, customer, team_id=False):
-        _logger.warning(str(customer.__dict__))
-
+    def handle_partner_assignation(self, action='create', partner_id=False):
         # make call get data
         teliapi = self.env['teliapi.teliapi']
-        _logger.debug("user_id is: %s" % self.user_id.id)
-        # FIXME is this the correct way to get the lead2opportunity
-        lead2opportunity = self.env['crm.lead2opportunity.partner'].search([('user_id', '=', self.user_id.id)], limit=1)
+        current_user = self.env['res.users'].browse(self.user_id.id)
 
-        _logger.debug("customer id is: %s" % customer)
-        _logger.debug("opportunity action is: %s" % lead2opportunity.action)
-        if lead2opportunity.action == 'create':
+        if action == 'create':
             # customer doesn't exist
             first_name, last_name = self._format_name(self.contact_name)
-            # salesperson = self.env['res.users'].browse(self.user_id)
             params = {
                 'first_name': first_name,
                 'last_name': last_name,
-                'phone': self.phone,
+                'phone': self.phone if self.phone else self.mobile,
                 'email': self.email_from,
-                'username': "%s.%s" % (first_name, last_name), # FIXME what should this be?
+                'username': self.username if self.username else "%s.%s" % (first_name, last_name),
                 'company_name': self.partner_name,
-                # 'token': salesperson.sales_associate_token, # FIXME should come from res.users (lookup with crm.lead.user_id?)
+                'credit': self.account_credit,
+                'token': current_user.teli_token,
             }
+
             create_response = teliapi.create_user(params)
-            # TODO do we need to check the create_response to and buble up errors?
 
-        return super()._convert_opportunity_data(customer, team_id)
+            # Check the response and set a note if the call was successful or not
+            if create_response['code'] is not 200:
+                self.message_post(content_subtype='plaintext', subject='Teli API Warning',
+                    body='[WARNING] Encountered an issue attempting to create the new user.')
+            else:
+                self.message_post(content_subtype='plaintext', subject='Teli API Note',
+                    body='[SUCCESS] New customer account was successfully created.')
 
-    @api.multi
-    def action_set_won(self):
-        _logger.debug('landed in teli_crm.action_set_won')
-        api_response = self.env['teliapi.teliapi'].get_user()
-
-        return super().action_set_won()
-
-    @api.multi
-    def action_set_lost(self):
-        _logger.debug('OH NO!!! lead has been lost!')
-        return super().action_set_lost()
+        return super().handle_partner_assignation(action, partner_id)

@@ -5,14 +5,14 @@ import json
 import logging
 
 _logger = logging.getLogger(__name__)
-_logger.setLevel('DEBUG')
+# uncomment for debugging
+# _logger.setLevel('DEBUG')
 
 class Teliapi(http.Controller):
     """ Teliapi - A controller for making requests to teli's API system.
     """
 
-    _host = 'https://apiv1.teleapi.net'
-    _token = '9103c865-dd7d-490c-a05c-fb17f1e57e28' # FIXME This is mines, and needs to go away once I configure the teli_users module
+    _host = 'https://eadmin.teli.co'
     _create_user_count = 0 # used to increment if username already exists
 
     @classmethod
@@ -21,11 +21,6 @@ class Teliapi(http.Controller):
             function: a string identifying the API endpoint
             params: a dict of params to pass to the API
         """
-
-        if 'token' not in params:
-            # set the token if the calling method left it out
-            # FIXME the token needs to be salesperson specific
-            params['token'] = self._token
 
         try:
             host = alt_host if alt_host else self._host
@@ -38,7 +33,6 @@ class Teliapi(http.Controller):
 
             _logger.debug(json.dumps(content))
 
-            # TODO work on some error handling
             if response.status_code != 200 or content['code'] != 200:
                 _logger.error("[%s] Received non-200 status code" %
                     (response.status_code if response.status_code != 200 else content['code']))
@@ -68,9 +62,12 @@ class Teliapi(http.Controller):
             'first_name': params['first_name'],
             'last_name': params['last_name'],
             'phone': params['phone'],
-            'credit': '25', # TODO should this be a custom variable like username?
-            # 'token': self._token # FIXME shall use the sales assoc. token
+            'credit': params['credit'],
+            'token': params['token'],
         }
+
+        for key, value in request_params.items():
+            _logger.debug("%s => %s" % (key, value))
 
         # optional param, but will probably be needed/supplied by sales
         if params['company_name']:
@@ -79,9 +76,10 @@ class Teliapi(http.Controller):
         if new_username:
             request_params['username'] = new_username
 
-        response = self._call('/sales/create_customer', request_params, 'https://eadmin.teli.co')
+        response = self._call('/sales/create_customer', request_params)
 
         if response['code'] is 400 and response['data'] is 'Username already in use':
+            # FIXME this is untested, and shouldn't be necessary because the associate can set the username in the CRM.
             # username error
             self._create_user_count += 1
             response = self.create_customer(params, ''.join([request_params['username'], str(self._create_user_count)])) # TODO need to do something else and rerun
@@ -94,11 +92,11 @@ class Teliapi(http.Controller):
         """ get_user - Attempts to retrieve the user from teli_api
             returns: a json structure
         """
-        return self._call('/user/get')['data']
+        return self._call('/user/get', alt_host='https://apiv1.teleapi.net')['data']
 
     @http.route('/teliapi/user/get', type='http', auth='user')
     def get_user_direct(self):
         """ get_user_direct - external testing endpoint for get_user
             returns: a json structure
         """
-        return json.dumps(self._call('/user/get')['data'])
+        return json.dumps(self._call('/user/get', alt_host='https://apiv1.teleapi.net')['data'])
