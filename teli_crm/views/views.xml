@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+        <record id="teli_crm.list" model="ir.ui.view">
+            <field name="name">teli_crm.list</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//page[@name='extra']" position="after">
+                        <page string="Teli Settings">
+                            <group>
+                                <field name="username"/>
+                                <field name="account_credit"/>
+                            </group>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+        <record id="teli_crm.list_opportunity" model="ir.ui.view">
+            <field name="name">teli_crm.list.opportunity</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//page[@name='lead']" position="after">
+                        <page string="Teli Info">
+                            <group>
+                                <field name="username"/>
+                                <field name="account_credit"/>
+                            </group>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+    </data>
+</odoo>
