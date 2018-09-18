@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_res_users_teli,access_res_users_teli,model_res_users_teli,base.group_user,1,0,0,0
+access_teli_users_teli_users,access_teli_users_teli_users,model_teli_users_teli_users,base.group_user,1,0,0,0

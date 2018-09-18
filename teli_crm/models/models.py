@@ -67,7 +67,7 @@ class teli_crm(models.Model):
             params = {
                 'first_name': first_name,
                 'last_name': last_name,
-                'phone': self.phone if self.phone else self.mobile,
+                'phone': self.mobile if self.mobile else self.phone,
                 'email': self.email_from,
                 'username': self.username if self.username else "%s.%s" % (first_name, last_name),
                 'company_name': self.partner_name,
