@@ -17,7 +17,7 @@ class teli_crm(models.Model):
         # help='The name of the future partner company that will be created while converting the lead into opportunity')
     # phone = fields.Char('Phone', required=True)
 
-    username = fields.Char('Username', required=True, help='Provide the username you want to assign to the lead')
+    username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     account_credit = fields.Char('Initial Account Credit', default='25')
 
     def _format_phone_number(self, phone_number):
