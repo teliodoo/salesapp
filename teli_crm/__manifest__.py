@@ -6,10 +6,10 @@
 
     'description': """
         When a new lead qualifies, during the conversion process, calls shall
-        be made to the Teli API to create the lead's account automagically.
+        be made to the teli API to create the lead's account automagically.
     """,
 
-    'author': "Teli Inc.",
+    'author': "teli Inc.",
     'website': "http://www.teli.net",
 
     # Categories can be used to filter modules in modules listing
@@ -30,6 +30,8 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+
+        'wizard/lead_to_opportunity.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

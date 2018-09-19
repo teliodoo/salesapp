@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//page[@name='extra']" position="after">
-                        <page string="Teli Settings">
+                        <page string="teli Settings">
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>
@@ -26,7 +26,7 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//page[@name='lead']" position="after">
-                        <page string="Teli Info">
+                        <page string="teli Info">
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>

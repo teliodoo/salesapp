@@ -2,7 +2,7 @@
 {
     'name': "teli_users",
 
-    'summary': "Allows Sales Associates to set their Teli API token",
+    'summary': "Allows Sales Associates to set their teli API token",
 
     'description': """
         Extends the res.user model with a sales associate token which is needed
@@ -10,7 +10,7 @@
         are connected to their sales contact.
     """,
 
-    'author': "Teli Inc.",
+    'author': "teli Inc.",
     'website': "http://www.teli.net",
 
     # Categories can be used to filter modules in modules listing

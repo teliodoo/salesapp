@@ -2,13 +2,13 @@
 {
     'name': "teliapi",
 
-    'summary': "Facilitate communication with Teli's API",
+    'summary': "Facilitate communication with teli's API",
 
     'description': """
-        A module built to communicate with the Teli Customer API.
+        A module built to communicate with the teli Customer API.
     """,
 
-    'author': "Teli Inc.",
+    'author': "teli Inc.",
     'website': "http://www.teli.net",
 
     # Categories can be used to filter modules in modules listing

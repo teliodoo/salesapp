@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="view_lead2opportunity_form" model="ir.ui.view">
+            <field name="name">teli_lead2opportunity_partner.list</field>
+            <field name="model">crm.lead2opportunity.partner</field>
+            <field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//group[@name='action']" position="after">
+                        <group string="Qualification Questions" name="qualifications" col="2">
+                            <field name="monthly_usage"/>
+                            <field name="number_of_dids"/>
+                            <field name="potential"/>
+                            <field name="current_service"/>
+                            <field name="under_contract"/>
+                            <field name="valid_use_case"/>
+                            <field name="share_rates"/>
+                        </group>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>
