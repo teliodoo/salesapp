@@ -8,14 +8,27 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//group[@name='action']" position="after">
-                        <group string="Qualification Questions" name="qualifications" col="2">
-                            <field name="monthly_usage"/>
-                            <field name="number_of_dids"/>
-                            <field name="potential"/>
-                            <field name="current_service"/>
-                            <field name="under_contract"/>
-                            <field name="valid_use_case"/>
-                            <field name="share_rates"/>
+                        <group string="Qualification Questions" name="qualifications" col="4">
+                            <label for="monthly_usage" colspan="3"/>
+                            <field name="monthly_usage" colspan="1" nolabel="1"/>
+
+                            <label for="number_of_dids" colspan="3"/>
+                            <field name="number_of_dids" colspan="1" nolabel="1"/>
+
+                            <label for="potential" colspan="3"/>
+                            <field name="potential" colspan="1" nolabel="1"/>
+
+                            <label for="current_service" colspan="3"/>
+                            <field name="current_service" colspan="1" nolabel="1"/>
+
+                            <label for="under_contract" colspan="3"/>
+                            <field name="under_contract" colspan="1" nolabel="1"/>
+
+                            <label for="valid_use_case" colspan="3"/>
+                            <field name="valid_use_case" colspan="1" nolabel="1"/>
+
+                            <label for="share_rates" colspan="3"/>
+                            <field name="share_rates" colspan="1" nolabel="1"/>
                         </group>
                     </xpath>
                 </data>
