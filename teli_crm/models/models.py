@@ -79,10 +79,10 @@ class teli_crm(models.Model):
 
             # Check the response and set a note if the call was successful or not
             if create_response['code'] is not 200:
-                self.message_post(content_subtype='plaintext', subject='Teli API Warning',
+                self.message_post(content_subtype='plaintext', subject='teli API Warning',
                     body='[WARNING] Encountered an issue attempting to create the new user.')
             else:
-                self.message_post(content_subtype='plaintext', subject='Teli API Note',
+                self.message_post(content_subtype='plaintext', subject='teli API Note',
                     body='[SUCCESS] New customer account was successfully created.')
 
         return super().handle_partner_assignation(action, partner_id)
