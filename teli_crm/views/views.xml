@@ -31,6 +31,31 @@
                                 <field name="username"/>
                                 <field name="account_credit"/>
                             </group>
+                            <group string="Addtional Qualification Questions" col="4">
+                                <label for="buying_motivation" colspan="3"/>
+                                <field name="buying_motivation" colspan="1" nolabel="1"/>
+
+                                <label for="decision_maker" colspan="3"/>
+                                <field name="decision_maker" colspan="1" nolabel="1"/>
+                            </group>
+                            <group string="Qualified Technical Compatibility" col="4">
+                                <label for="current_messaging_platform" colspan="3"/>
+                                <field name="current_messaging_platform" colspan="1" nolabel="1"/>
+
+                                <label for="interface_preference" colspan="3"/>
+                                <field name="interface_preference" colspan="1" nolabel="1"/>
+
+                                <label for="voice_config" colspan="3"/>
+                                <field name="voice_config" colspan="1" nolabel="1"/>
+
+                                <separator colspan="4"/>
+
+                                <label for="customizations" colspan="2"/>
+                                <field name="customizations" colspan="2" nolabel="1"/>
+
+                                <label for="known_issues" colspan="2"/>
+                                <field name="known_issues" colspan="2" nolabel="1"/>
+                            </group>
                         </page>
                     </xpath>
                 </data>

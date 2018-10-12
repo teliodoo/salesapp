@@ -20,6 +20,26 @@ class teli_crm(models.Model):
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     account_credit = fields.Char('Initial Account Credit', default='25')
 
+    buying_motivation = fields.Selection([
+            ('pain', 'Pain?'),
+            ('gain', 'Gain?')
+        ], 'What\'s the primary motivation for choosing teli?', required=True)
+    decision_maker = fields.Selection([
+            ('decision_maker', 'End Decision Maker'),
+            ('influencer', 'Large Influencer'),
+            ('individual', 'Individual')
+        ], 'Who is personally overseeing the implementation?', required=True,
+        help='Give an overview of the expectations of the next call and the ideal outcome.')
+    current_messaging_platform = fields.Char('Current Messaging Platform?',
+        help='Is it compatible with XMPP, SMPP, or web services?', required=True)
+    interface_preference = fields.Selection([
+            ('api', 'API'),
+            ('portal', 'Portal')
+        ], 'Preferred method of interface?', required=True)
+    voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
+    customizations = fields.Text('Any customizations needed?')
+    known_issues = fields.Text('Any known issues?')
+
     def _format_phone_number(self, phone_number):
         """ _format_phone_number - Attempts to print a phone number in a more
             readable format.
@@ -46,7 +66,10 @@ class teli_crm(models.Model):
             @param name the value of the name field
             @returns first_name, last_name
         """
-        name_array = name.split()
+        if name:
+            name_array = name.split()
+        else:
+            return '', ''
 
         if len(name_array) == 2:
             return name_array[0], name_array[1]
