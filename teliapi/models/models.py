@@ -13,13 +13,13 @@ class teliapi(models.Model):
     def create_user(self, params):
         """ create_user - attempts to call the user signup API
             params: A dict containing the following params
-                - token
-                - first_name
-                - last_name
-                - email
-                - phone
-                - username (optional)
-                - company_name (optional)
+             - token
+             - first_name
+             - last_name
+             - email
+             - phone
+             - username (optional)
+             - company_name (optional)
         """
 
         response = Teliapi.create_user(params)
