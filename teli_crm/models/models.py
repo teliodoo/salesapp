@@ -20,26 +20,6 @@ class teli_crm(models.Model):
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     account_credit = fields.Char('Initial Account Credit', default='25')
 
-    buying_motivation = fields.Selection([
-            ('pain', 'Pain?'),
-            ('gain', 'Gain?')
-        ], 'What\'s the primary motivation for choosing teli?', required=True)
-    decision_maker = fields.Selection([
-            ('decision_maker', 'End Decision Maker'),
-            ('influencer', 'Large Influencer'),
-            ('individual', 'Individual')
-        ], 'Who is personally overseeing the implementation?', required=True,
-        help='Give an overview of the expectations of the next call and the ideal outcome.')
-    current_messaging_platform = fields.Char('Current Messaging Platform?',
-        help='Is it compatible with XMPP, SMPP, or web services?', required=True)
-    interface_preference = fields.Selection([
-            ('api', 'API'),
-            ('portal', 'Portal')
-        ], 'Preferred method of interface?', required=True)
-    voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
-    customizations = fields.Text('Any customizations needed?')
-    known_issues = fields.Text('Any known issues?')
-
     def _format_phone_number(self, phone_number):
         """ _format_phone_number - Attempts to print a phone number in a more
             readable format.
@@ -109,3 +89,19 @@ class teli_crm(models.Model):
                     body='[SUCCESS] New customer account was successfully created.')
 
         return super().handle_partner_assignation(action, partner_id)
+
+    @api.multi
+    @api.constrains('partner_id')
+    def _check_customer(self):
+        """ clean up duplications of the partner_id """
+
+    @api.constrains('partner_name')
+    def _update_teli_username(self):
+        """ based on the company name, attempt to set a default username
+            NOTE: Should this function search through all partner_names to see
+               if it has been used before? Is this really necessary?  How
+               does this effect non-new accounts?
+        """
+        if self.username is None:
+            self.username = self.partner_name.lower().replace(' ', '')
+            _logger.debug('username is now: %s' % self.username)
