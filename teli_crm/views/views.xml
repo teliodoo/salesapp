@@ -7,11 +7,16 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
                 <data>
+                    <xpath expr="//button[@name='123']" position="replace">
+                        <button name="123" string="Convert to Account" type="action"
+                            class="oe_highlight" attrs="{'invisible': [('type', '=', 'convert')]}"/>
+                    </xpath>
                     <xpath expr="//page[@name='extra']" position="after">
                         <page string="teli Settings">
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>
+                                <field name="uuid"/>
                             </group>
                         </page>
                     </xpath>
@@ -30,6 +35,7 @@
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>
+                                <field name="uuid"/>
                             </group>
                         </page>
                     </xpath>

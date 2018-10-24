@@ -88,8 +88,8 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 current_platform=self.current_messaging_platform,
                 interface_preference=self.interface_preference,
                 using_sip='yes' if self.voice_config else 'no',
-                customizations=self.customizations,
-                known_issues=self.known_issues)
+                customizations=self.customizations if self.customizations else 'N/A',
+                known_issues=self.known_issues if self.known_issues else 'N/A')
 
         _logger.debug("body: %s" % body)
         leads = self.env['crm.lead'].browse(self._context.get('active_ids', []))

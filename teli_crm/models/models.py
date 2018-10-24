@@ -5,39 +5,14 @@ import logging
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
-# _logger.setLevel('DEBUG')
+_logger.setLevel('DEBUG')
 
 class teli_crm(models.Model):
     _inherit = 'crm.lead'
 
-    # Override fields we want to be required for account creation
-    # contact_name = fields.Char('Contact Name', required=True)
-    # email_from = fields.Char('Email', help="Email address of the contact", index=True, required=True)
-    # partner_name = fields.Char("Customer Name", index=True, required=True,
-        # help='The name of the future partner company that will be created while converting the lead into opportunity')
-    # phone = fields.Char('Phone', required=True)
-
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
+    uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
-
-    def _format_phone_number(self, phone_number):
-        """ _format_phone_number - Attempts to print a phone number in a more
-            readable format.
-            @param phone_number
-            @returns a pretty printed number
-        """
-        if len(phone_number) == 7:
-            # format a 7 digit number
-            return "%s-%s" % (phone_number[:3], phone_number[3:])
-        elif len(phone_number) == 10:
-            # format number with area code
-            return "(%s) %s-%s" % (phone_number[:3], phone_number[3:6], phone_number[6:])
-        elif len(phone_number) == 11:
-            # format number with country and area code
-            return "+%s (%s) %s-%s" % (phone_number[:1], phone_number[1:4], phone_number[4:7], phone_number[7:])
-
-        # fail path
-        return phone_number
 
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
@@ -65,7 +40,7 @@ class teli_crm(models.Model):
         current_user = self.env['res.users'].browse(self.user_id.id)
 
         if action == 'create':
-            # customer doesn't exist
+            # account doesn't exist
             first_name, last_name = self._format_name(self.contact_name)
             params = {
                 'first_name': first_name,
@@ -83,18 +58,26 @@ class teli_crm(models.Model):
             # Check the response and set a note if the call was successful or not
             if create_response['code'] is not 200:
                 self.message_post(content_subtype='plaintext', subject='teli API Warning',
-                    body='[WARNING] Encountered an issue attempting to create the new user.')
+                    body='[WARNING] Encountered an issue attempting to create the new account.')
             else:
                 self.message_post(content_subtype='plaintext', subject='teli API Note',
-                    body='[SUCCESS] New customer account was successfully created.')
+                    body='[SUCCESS] New account was successfully created.')
+
+                # if success, try to grab the uuid and update the oppr/acct
+                user_response = teliapi.find_by_username({
+                    'token': current_user.teli_token,
+                    'username': self.username if self.username else "%s.%s" % (first_name, last_name)
+                })
+                self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
 
         return super().handle_partner_assignation(action, partner_id)
 
     @api.multi
     @api.constrains('partner_id')
-    def _check_customer(self):
+    def _check_accounts(self):
         """ clean up duplications of the partner_id """
 
+    @api.multi
     @api.constrains('partner_name')
     def _update_teli_username(self):
         """ based on the company name, attempt to set a default username
@@ -102,6 +85,37 @@ class teli_crm(models.Model):
                if it has been used before? Is this really necessary?  How
                does this effect non-new accounts?
         """
-        if self.username is None:
-            self.username = self.partner_name.lower().replace(' ', '')
+        if not self.username:
+            self.username = self.partner_name.lower().replace(' ', '.')[:64]
             _logger.debug('username is now: %s' % self.username)
+
+    @api.multi
+    @api.onchange('username')
+    def _lookup_teli_username(self):
+        _logger.debug('type is: %s' % self.type)
+        if self.type == 'lead':
+            teliapi = self.env['teliapi.teliapi']
+            current_user = self.env['res.users'].browse(self.user_id.id)
+            _logger.debug('calling find_by_username for: %s' % self.username)
+            user_response = teliapi.find_by_username({
+                'token': current_user.teli_token,
+                'username': self.username
+            })
+
+            if 'auth_token' in user_response:
+                self.uuid = user_response['auth_token']
+                return {
+                    'warning': {
+                        'title': 'teli Username Check',
+                        'message': 'It appears \'%s\' is taken, are you sure you want to do this?' % self.username
+                    }
+                }
+            else:
+                self.uuid = ''
+        else:
+            return {
+                'warning': {
+                    'title': 'teli Username Check',
+                    'message': 'The account has already been created, changing it now is a bad idea.'
+                }
+            }
