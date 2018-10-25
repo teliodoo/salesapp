@@ -15,29 +15,29 @@ class teli_crm(models.Model):
     account_credit = fields.Char('Initial Account Credit', default='25')
 
     # qualification questions
-    monthly_usage = fields.Char(string='Number of monthly messages/minutes?', required=True)
-    number_of_dids = fields.Char(string='How many DIDs are in service?', required=True)
-    potential = fields.Char(string='What is the potential?', required=True)
-    current_service = fields.Char(string='What type of services are they currently using today in their company?', required=True)
-    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?', required=True)
+    monthly_usage = fields.Char(string='Number of monthly messages/minutes?')
+    number_of_dids = fields.Char(string='How many DIDs are in service?')
+    potential = fields.Char(string='What is the potential?')
+    current_service = fields.Char(string='What type of services are they currently using today in their company?')
+    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?')
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
     buying_motivation = fields.Selection([
             ('pain', 'Pain'),
             ('gain', 'Gain')
-        ], 'What\'s the primary motivation for choosing teli?', required=True)
+        ], 'What\'s the primary motivation for choosing teli?')
     decision_maker = fields.Selection([
             ('decision_maker', 'End Decision Maker'),
             ('influencer', 'Large Influencer'),
             ('individual', 'Individual')
-        ], 'Who is personally overseeing the implementation?', required=True,
+        ], 'Who is personally overseeing the implementation?',
         help='Give an overview of the expectations of the next call and the ideal outcome.')
     current_messaging_platform = fields.Char('Current Messaging Platform?',
-        help='Is it compatible with XMPP, SMPP, or web services?', required=True)
+        help='Is it compatible with XMPP, SMPP, or web services?')
     interface_preference = fields.Selection([
             ('api', 'API'),
             ('portal', 'Portal')
-        ], 'Preferred method of interface?', required=True)
+        ], 'Preferred method of interface?')
     voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
     customizations = fields.Text('Any customizations needed?')
     known_issues = fields.Text('Any known issues?')
