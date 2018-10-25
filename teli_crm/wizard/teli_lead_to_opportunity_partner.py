@@ -2,13 +2,18 @@
 
 import logging
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
-# _logger.setLevel('DEBUG')
+_logger.setLevel('DEBUG')
 
 class teli_lead2opportunity_partner(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'
+
+    # credential fields
+    username = fields.Char(string='teli Username', required=True)
+    account_credit = fields.Char('Initial Account Credit')
 
     # qualification questions
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?', required=True)
@@ -37,6 +42,17 @@ class teli_lead2opportunity_partner(models.TransientModel):
     voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
     customizations = fields.Text('Any customizations needed?')
     known_issues = fields.Text('Any known issues?')
+
+    @api.model
+    def default_get(self, fields):
+        """ Set the default values for teli username and initial account credit """
+        result = super().default_get(fields)
+        lead = self.env['crm.lead'].browse(self._context['active_id'])
+
+        result['username'] = lead.username if lead.username else ''
+        result['account_credit'] = lead.account_credit if lead.account_credit else 25
+
+        return result
 
     @api.multi
     def action_apply(self):
@@ -91,8 +107,39 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 customizations=self.customizations if self.customizations else 'N/A',
                 known_issues=self.known_issues if self.known_issues else 'N/A')
 
+        lead = self.env['crm.lead'].browse(self._context['active_id'])
+        lead.username = self.username
+        lead.account_credit = self.account_credit
+        lead.monthly_usage = self.monthly_usage
+        lead.number_of_dids = self.number_of_dids
+        lead.potential = self.potential
+        lead.current_service = self.current_service
+        lead.under_contract = self.under_contract
+        lead.valid_use_case = self.valid_use_case
+        lead.share_rates = self.share_rates
+        lead.buying_motivation = self.buying_motivation
+        lead.decision_maker = self.decision_maker
+        lead.current_messaging_platform = self.current_messaging_platform
+        lead.interface_preference = self.interface_preference
+        lead.voice_config = self.voice_config
+        lead.customizations = self.customizations
+        lead.known_issues = self.known_issues
+
         _logger.debug("body: %s" % body)
-        leads = self.env['crm.lead'].browse(self._context.get('active_ids', []))
-        leads[0].message_post(body=body, subject="Qualification Answers")
+        lead.message_post(body=body, subject="Qualification Answers")
 
         return super().action_apply()
+
+    @api.multi
+    @api.constrains('username')
+    def _lookup_teli_username(self):
+        teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
+        _logger.debug('calling find_by_username for: %s' % self.username)
+        user_response = teliapi.find_by_username({
+            'token': current_user.teli_token,
+            'username': self.username
+        })
+
+        if 'auth_token' in user_response:
+            raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)

@@ -14,6 +14,34 @@ class teli_crm(models.Model):
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
 
+    # qualification questions
+    monthly_usage = fields.Char(string='Number of monthly messages/minutes?', required=True)
+    number_of_dids = fields.Char(string='How many DIDs are in service?', required=True)
+    potential = fields.Char(string='What is the potential?', required=True)
+    current_service = fields.Char(string='What type of services are they currently using today in their company?', required=True)
+    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?', required=True)
+    valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
+    share_rates = fields.Boolean(string='Willing to share target rates?')
+    buying_motivation = fields.Selection([
+            ('pain', 'Pain'),
+            ('gain', 'Gain')
+        ], 'What\'s the primary motivation for choosing teli?', required=True)
+    decision_maker = fields.Selection([
+            ('decision_maker', 'End Decision Maker'),
+            ('influencer', 'Large Influencer'),
+            ('individual', 'Individual')
+        ], 'Who is personally overseeing the implementation?', required=True,
+        help='Give an overview of the expectations of the next call and the ideal outcome.')
+    current_messaging_platform = fields.Char('Current Messaging Platform?',
+        help='Is it compatible with XMPP, SMPP, or web services?', required=True)
+    interface_preference = fields.Selection([
+            ('api', 'API'),
+            ('portal', 'Portal')
+        ], 'Preferred method of interface?', required=True)
+    voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
+    customizations = fields.Text('Any customizations needed?')
+    known_issues = fields.Text('Any known issues?')
+
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
             into only first and last names.  This assumes the number is formatted:
@@ -39,36 +67,35 @@ class teli_crm(models.Model):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
 
-        if action == 'create':
-            # account doesn't exist
-            first_name, last_name = self._format_name(self.contact_name)
-            params = {
-                'first_name': first_name,
-                'last_name': last_name,
-                'phone': self.mobile if self.mobile else self.phone,
-                'email': self.email_from,
-                'username': self.username if self.username else "%s.%s" % (first_name, last_name),
-                'company_name': self.partner_name,
-                'credit': self.account_credit,
+        # attempt to create the account
+        first_name, last_name = self._format_name(self.contact_name)
+        params = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': self.mobile if self.mobile else self.phone,
+            'email': self.email_from,
+            'username': self.username if self.username else "%s.%s" % (first_name, last_name),
+            'company_name': self.partner_name,
+            'credit': self.account_credit,
+            'token': current_user.teli_token,
+        }
+
+        create_response = teliapi.create_user(params)
+
+        # Check the response and set a note if the call was successful or not
+        if create_response['code'] is not 200:
+            self.message_post(content_subtype='plaintext', subject='teli API Warning',
+                body='[WARNING] Received the following error from teli: %s' % create_response['data'])
+        else:
+            self.message_post(content_subtype='plaintext', subject='teli API Note',
+                body='[SUCCESS] New account was successfully created.')
+
+            # if success, try to grab the uuid and update the oppr/acct
+            user_response = teliapi.find_by_username({
                 'token': current_user.teli_token,
-            }
-
-            create_response = teliapi.create_user(params)
-
-            # Check the response and set a note if the call was successful or not
-            if create_response['code'] is not 200:
-                self.message_post(content_subtype='plaintext', subject='teli API Warning',
-                    body='[WARNING] Encountered an issue attempting to create the new account.')
-            else:
-                self.message_post(content_subtype='plaintext', subject='teli API Note',
-                    body='[SUCCESS] New account was successfully created.')
-
-                # if success, try to grab the uuid and update the oppr/acct
-                user_response = teliapi.find_by_username({
-                    'token': current_user.teli_token,
-                    'username': self.username if self.username else "%s.%s" % (first_name, last_name)
-                })
-                self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
+                'username': self.username if self.username else "%s.%s" % (first_name, last_name)
+            })
+            self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
 
         return super().handle_partner_assignation(action, partner_id)
 
@@ -76,46 +103,3 @@ class teli_crm(models.Model):
     @api.constrains('partner_id')
     def _check_accounts(self):
         """ clean up duplications of the partner_id """
-
-    @api.multi
-    @api.constrains('partner_name')
-    def _update_teli_username(self):
-        """ based on the company name, attempt to set a default username
-            NOTE: Should this function search through all partner_names to see
-               if it has been used before? Is this really necessary?  How
-               does this effect non-new accounts?
-        """
-        if not self.username:
-            self.username = self.partner_name.lower().replace(' ', '.')[:64]
-            _logger.debug('username is now: %s' % self.username)
-
-    @api.multi
-    @api.onchange('username')
-    def _lookup_teli_username(self):
-        _logger.debug('type is: %s' % self.type)
-        if self.type == 'lead':
-            teliapi = self.env['teliapi.teliapi']
-            current_user = self.env['res.users'].browse(self.user_id.id)
-            _logger.debug('calling find_by_username for: %s' % self.username)
-            user_response = teliapi.find_by_username({
-                'token': current_user.teli_token,
-                'username': self.username
-            })
-
-            if 'auth_token' in user_response:
-                self.uuid = user_response['auth_token']
-                return {
-                    'warning': {
-                        'title': 'teli Username Check',
-                        'message': 'It appears \'%s\' is taken, are you sure you want to do this?' % self.username
-                    }
-                }
-            else:
-                self.uuid = ''
-        else:
-            return {
-                'warning': {
-                    'title': 'teli Username Check',
-                    'message': 'The account has already been created, changing it now is a bad idea.'
-                }
-            }

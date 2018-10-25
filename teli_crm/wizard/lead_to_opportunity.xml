@@ -8,7 +8,11 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//group[@name='action']" position="after">
-                        <group string="Qualification Opportunity" name="qualifications" col="4">
+                        <group string="Account Credential Information" name="credential">
+                            <field name="username"/>
+                            <field name="account_credit"/>
+                        </group>
+                        <group string="Qualification Questions" name="qualifications" col="4">
                             <label for="monthly_usage" colspan="3"/>
                             <field name="monthly_usage" colspan="1" nolabel="1"/>
 
@@ -29,8 +33,7 @@
 
                             <label for="share_rates" colspan="3"/>
                             <field name="share_rates" colspan="1" nolabel="1"/>
-                        </group>
-                        <group string="Addtional Qualification Questions" col="4">
+
                             <label for="buying_motivation" colspan="3"/>
                             <field name="buying_motivation" colspan="1" nolabel="1"/>
 
