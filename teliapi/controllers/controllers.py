@@ -56,7 +56,7 @@ class Teliapi(http.Controller):
         """
 
         request_params = {
-            'username': params['username'] if params['username'] else
+            'username': params['username'] if 'username' in params else
                 ("%s-%s" % (params['first_name'], params['last_name'])), # TODO what shall the username be?
             'email': params['email'],
             'first_name': params['first_name'],
@@ -65,6 +65,13 @@ class Teliapi(http.Controller):
             'credit': params['credit'],
             'token': params['token'],
         }
+
+        # debugging the return
+        # return {
+        #     "code": 200,
+        #     "status": "success",
+        #     "data": "[DEBUG] An account was not created"
+        # }
 
         for key, value in request_params.items():
             _logger.debug("%s => %s" % (key, value))
@@ -86,6 +93,35 @@ class Teliapi(http.Controller):
 
         # bubble up 200s and 500s to the model
         return response
+
+    @classmethod
+    def find_by_username(self, params, offset=0):
+        """ find_by_username
+        """
+        response = self._call('/user/info/username', {
+            'username': params['username'],
+            'user_type': 'master',
+            'token': params['token']
+        })
+
+        # check the response for no data returned
+        if response['code'] is not 200:
+            _logger.warning('[ERROR][%s] received an error: %s' % (response['code'], response['data']))
+            return {}
+
+        if len(response['data']) is 0:
+            _logger.warning('No results found')
+            return {}
+
+        # search the data for the recently created user account
+        for user in response['data']:
+            _logger.debug('checking user: %s' % user['username'])
+            if params['username'] == user['username']:
+                _logger.debug('Found the right user!!!')
+                return user
+
+        _logger.warning('Couldn\'t find the correct user...')
+        return {}
 
     @classmethod
     def get_user(self):

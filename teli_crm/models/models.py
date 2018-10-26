@@ -10,34 +10,37 @@ _logger = logging.getLogger(__name__)
 class teli_crm(models.Model):
     _inherit = 'crm.lead'
 
-    # Override fields we want to be required for account creation
-    # contact_name = fields.Char('Contact Name', required=True)
-    # email_from = fields.Char('Email', help="Email address of the contact", index=True, required=True)
-    # partner_name = fields.Char("Customer Name", index=True, required=True,
-        # help='The name of the future partner company that will be created while converting the lead into opportunity')
-    # phone = fields.Char('Phone', required=True)
-
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
+    uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
 
-    def _format_phone_number(self, phone_number):
-        """ _format_phone_number - Attempts to print a phone number in a more
-            readable format.
-            @param phone_number
-            @returns a pretty printed number
-        """
-        if len(phone_number) == 7:
-            # format a 7 digit number
-            return "%s-%s" % (phone_number[:3], phone_number[3:])
-        elif len(phone_number) == 10:
-            # format number with area code
-            return "(%s) %s-%s" % (phone_number[:3], phone_number[3:6], phone_number[6:])
-        elif len(phone_number) == 11:
-            # format number with country and area code
-            return "+%s (%s) %s-%s" % (phone_number[:1], phone_number[1:4], phone_number[4:7], phone_number[7:])
-
-        # fail path
-        return phone_number
+    # qualification questions
+    monthly_usage = fields.Char(string='Number of monthly messages/minutes?')
+    number_of_dids = fields.Char(string='How many DIDs are in service?')
+    potential = fields.Char(string='What is the potential?')
+    current_service = fields.Char(string='What type of services are they currently using today in their company?')
+    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?')
+    valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
+    share_rates = fields.Boolean(string='Willing to share target rates?')
+    buying_motivation = fields.Selection([
+            ('pain', 'Pain'),
+            ('gain', 'Gain')
+        ], 'What\'s the primary motivation for choosing teli?')
+    decision_maker = fields.Selection([
+            ('decision_maker', 'End Decision Maker'),
+            ('influencer', 'Large Influencer'),
+            ('individual', 'Individual')
+        ], 'Who is personally overseeing the implementation?',
+        help='Give an overview of the expectations of the next call and the ideal outcome.')
+    current_messaging_platform = fields.Char('Current Messaging Platform?',
+        help='Is it compatible with XMPP, SMPP, or web services?')
+    interface_preference = fields.Selection([
+            ('api', 'API'),
+            ('portal', 'Portal')
+        ], 'Preferred method of interface?')
+    voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
+    customizations = fields.Text('Any customizations needed?')
+    known_issues = fields.Text('Any known issues?')
 
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
@@ -46,7 +49,10 @@ class teli_crm(models.Model):
             @param name the value of the name field
             @returns first_name, last_name
         """
-        name_array = name.split()
+        if name:
+            name_array = name.split()
+        else:
+            return '', ''
 
         if len(name_array) == 2:
             return name_array[0], name_array[1]
@@ -61,28 +67,39 @@ class teli_crm(models.Model):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
 
-        if action == 'create':
-            # customer doesn't exist
-            first_name, last_name = self._format_name(self.contact_name)
-            params = {
-                'first_name': first_name,
-                'last_name': last_name,
-                'phone': self.mobile if self.mobile else self.phone,
-                'email': self.email_from,
-                'username': self.username if self.username else "%s.%s" % (first_name, last_name),
-                'company_name': self.partner_name,
-                'credit': self.account_credit,
+        # attempt to create the account
+        first_name, last_name = self._format_name(self.contact_name)
+        params = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': self.mobile if self.mobile else self.phone,
+            'email': self.email_from,
+            'username': self.username if self.username else "%s.%s" % (first_name, last_name),
+            'company_name': self.partner_name,
+            'credit': self.account_credit,
+            'token': current_user.teli_token,
+        }
+
+        create_response = teliapi.create_user(params)
+
+        # Check the response and set a note if the call was successful or not
+        if create_response['code'] is not 200:
+            self.message_post(content_subtype='plaintext', subject='teli API Warning',
+                body='[WARNING] Received the following error from teli: %s' % create_response['data'])
+        else:
+            self.message_post(content_subtype='plaintext', subject='teli API Note',
+                body='[SUCCESS] New account was successfully created.')
+
+            # if success, try to grab the uuid and update the oppr/acct
+            user_response = teliapi.find_by_username({
                 'token': current_user.teli_token,
-            }
-
-            create_response = teliapi.create_user(params)
-
-            # Check the response and set a note if the call was successful or not
-            if create_response['code'] is not 200:
-                self.message_post(content_subtype='plaintext', subject='teli API Warning',
-                    body='[WARNING] Encountered an issue attempting to create the new user.')
-            else:
-                self.message_post(content_subtype='plaintext', subject='teli API Note',
-                    body='[SUCCESS] New customer account was successfully created.')
+                'username': self.username if self.username else "%s.%s" % (first_name, last_name)
+            })
+            self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
 
         return super().handle_partner_assignation(action, partner_id)
+
+    @api.multi
+    @api.constrains('partner_id')
+    def _check_accounts(self):
+        """ clean up duplications of the partner_id """

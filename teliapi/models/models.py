@@ -5,6 +5,8 @@ from odoo.addons.teliapi.controllers.controllers import Teliapi
 import logging
 
 _logger = logging.getLogger(__name__)
+# uncomment for debugging
+# _logger.setLevel('DEBUG')
 
 class teliapi(models.Model):
     _name = "teliapi.teliapi"
@@ -13,18 +15,24 @@ class teliapi(models.Model):
     def create_user(self, params):
         """ create_user - attempts to call the user signup API
             params: A dict containing the following params
-                - token
-                - first_name
-                - last_name
-                - email
-                - phone
-                - username (optional)
-                - company_name (optional)
+             - token
+             - first_name
+             - last_name
+             - email
+             - phone
+             - username (optional)
+             - company_name (optional)
         """
+        return Teliapi.create_user(params)
 
-        response = Teliapi.create_user(params)
-
-        return response
+    @api.multi
+    def find_by_username(self, params):
+        """ find_by_username - searches the teli API for a specific username
+            params: a dict containing the following params
+             - token
+             - username
+        """
+        return Teliapi.find_by_username(params)
 
     @api.multi
     def get_user(self):
