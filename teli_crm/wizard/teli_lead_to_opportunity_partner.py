@@ -6,7 +6,7 @@ from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
-_logger.setLevel('DEBUG')
+# _logger.setLevel('DEBUG')
 
 class teli_lead2opportunity_partner(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'

@@ -5,7 +5,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
-_logger.setLevel('DEBUG')
+# _logger.setLevel('DEBUG')
 
 class teli_crm(models.Model):
     _inherit = 'crm.lead'

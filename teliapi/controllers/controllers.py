@@ -6,7 +6,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
-_logger.setLevel('DEBUG')
+# _logger.setLevel('DEBUG')
 
 class Teliapi(http.Controller):
     """ Teliapi - A controller for making requests to teli's API system.
