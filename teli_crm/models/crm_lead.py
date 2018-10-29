@@ -10,6 +10,10 @@ _logger = logging.getLogger(__name__)
 class teli_crm(models.Model):
     _inherit = 'crm.lead'
 
+    partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
+                                    column1='lead_id', column2='partner_id', string='Contacts')
+    lead_ids = fields.Many2many(comodel_name='crm.lead', relation='teli_crm_lead_opp',
+                                    column1='opp_id', column2='lead_id', string='Lead', domain=[('type', '=', 'lead')])
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
