@@ -29,6 +29,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
+        'views/crm_view.xml',
         'views/templates.xml',
 
         'wizard/lead_to_opportunity.xml',

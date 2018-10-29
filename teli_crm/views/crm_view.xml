@@ -1,0 +1,28 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+        <record id="teli_crm.crm_case_form_view_leads_inhrtied" model="ir.ui.view">
+            <field name="name">teli_crm.list</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="replace">
+                        <button name="%(crm.action_crm_lead2opportunity_partner)d" string="Convert to Account" type="action"
+                            class="oe_highlight" attrs="{'invisible': [('type', '=', 'convert')]}"/>
+                    </xpath>
+                    <xpath expr="//page[last()]" position="after">
+                        <page string="Teli Settings">
+                            <group>
+                                <field name="username"/>
+                                <field name="account_credit"/>
+                                <field name="uuid"/>
+                            </group>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+    </data>
+</odoo>

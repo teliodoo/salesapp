@@ -1,7 +1,7 @@
 <odoo>
     <data>
         <!-- explicit list view definition -->
-        <record id="teli_crm.list" model="ir.ui.view">
+<!--         <record id="teli_crm.list" model="ir.ui.view">
             <field name="name">teli_crm.list</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
@@ -20,7 +20,7 @@
                     </xpath>
                 </data>
             </field>
-        </record>
+        </record> -->
 
         <record id="teli_crm.list_opportunity" model="ir.ui.view">
             <field name="name">teli_crm.list.opportunity</field>
