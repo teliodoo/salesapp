@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+        <record  id="teli_users.list" model="ir.ui.view">
+            <field name="name">teli_users.list</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//page[@name='access_rights']" position="after">
+                        <page string="teli Settings">
+                            <group string="Account Info">
+                                <field name="teli_token"/>
+                            </group>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>
