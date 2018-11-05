@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="view_lead2opportunity_form" model="ir.ui.view">
+            <field name="name">teli_lead2opportunity_partner.list</field>
+            <field name="model">crm.lead2opportunity.partner</field>
+            <field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='name']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                        <attribute name="force_save">1</attribute>
+                    </xpath>
+                    <xpath expr="//field[@name='partner_id']" position="replace">
+                            <field name="partner_ids"
+                                attrs="{'required': [('action', '=', 'exist')], 'invisible':[('action','!=','exist')]}"
+                                nolabel="1" colspan="2"/>
+                    </xpath>
+                    <xpath expr="//group[@name='action']" position="after">
+                        <group string="Account Credential Information" name="credential">
+                            <field name="username"/>
+                            <field name="account_credit"/>
+                        </group>
+                        <group string="Qualification Questions" name="qualifications" col="4">
+                            <label for="monthly_usage" colspan="3"/>
+                            <field name="monthly_usage" colspan="1" nolabel="1"/>
+
+                            <label for="number_of_dids" colspan="3"/>
+                            <field name="number_of_dids" colspan="1" nolabel="1"/>
+
+                            <label for="potential" colspan="3"/>
+                            <field name="potential" colspan="1" nolabel="1"/>
+
+                            <label for="current_service" colspan="3"/>
+                            <field name="current_service" colspan="1" nolabel="1"/>
+
+                            <label for="under_contract" colspan="3"/>
+                            <field name="under_contract" colspan="1" nolabel="1"/>
+
+                            <label for="valid_use_case" colspan="3"/>
+                            <field name="valid_use_case" colspan="1" nolabel="1"/>
+
+                            <label for="share_rates" colspan="3"/>
+                            <field name="share_rates" colspan="1" nolabel="1"/>
+
+                            <label for="buying_motivation" colspan="3"/>
+                            <field name="buying_motivation" colspan="1" nolabel="1"/>
+
+                            <label for="decision_maker" colspan="3"/>
+                            <field name="decision_maker" colspan="1" nolabel="1"/>
+                        </group>
+                        <group string="Qualified Technical Compatibility" col="4">
+                            <label for="current_messaging_platform" colspan="3"/>
+                            <field name="current_messaging_platform" colspan="1" nolabel="1"/>
+
+                            <label for="interface_preference" colspan="3"/>
+                            <field name="interface_preference" colspan="1" nolabel="1"/>
+
+                            <label for="voice_config" colspan="3"/>
+                            <field name="voice_config" colspan="1" nolabel="1"/>
+
+                            <separator colspan="4"/>
+
+                            <label for="customizations" colspan="2"/>
+                            <field name="customizations" colspan="2" nolabel="1"/>
+
+                            <label for="known_issues" colspan="2"/>
+                            <field name="known_issues" colspan="2" nolabel="1"/>
+                        </group>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>
