@@ -51,6 +51,20 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         result['username'] = lead.username if lead.username else ''
         result['account_credit'] = lead.account_credit if lead.account_credit else 25
+        result['monthly_usage'] = lead.monthly_usage
+        result['number_of_dids'] = lead.number_of_dids
+        result['potential'] = lead.potential
+        result['current_service'] = lead.current_service
+        result['under_contract'] = lead.under_contract
+        result['valid_use_case'] = lead.valid_use_case
+        result['share_rates'] = lead.share_rates
+        result['buying_motivation'] = lead.buying_motivation
+        result['decision_maker'] = lead.decision_maker
+        result['current_messaging_platform'] = lead.current_messaging_platform
+        result['interface_preference'] = lead.interface_preference
+        result['voice_config'] = lead.voice_config
+        result['customizations'] = lead.customizations
+        result['known_issues'] = lead.known_issues
 
         return result
 
@@ -122,8 +136,8 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.current_messaging_platform = self.current_messaging_platform
         lead.interface_preference = self.interface_preference
         lead.voice_config = self.voice_config
-        lead.customizations = self.customizations
-        lead.known_issues = self.known_issues
+        lead.customizations = self.customizations if self.customizations else 'N/A'
+        lead.known_issues = self.known_issues if self.known_issues else 'N/A'
 
         _logger.debug("body: %s" % body)
         lead.message_post(body=body, subject="Qualification Answers")
