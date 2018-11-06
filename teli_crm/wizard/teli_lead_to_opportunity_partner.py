@@ -11,8 +11,11 @@ _logger = logging.getLogger(__name__)
 class teli_lead2opportunity_partner(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'
 
-
-
+    action = fields.Selection([
+        ('exist', 'Link to an existing contact'),
+        ('create', 'Create a new contact'),
+        ('nothing', 'Do not link to a contact')
+    ], 'Related Contact', required=True)
     name = fields.Selection([('convert', 'Convert to opportunity')], default='convert')
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='wiz_teli_crm_partnerm2m',
                                     column1='lead_id', column2='partner_id', string='Contacts')
@@ -56,6 +59,20 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         result['username'] = lead.username if lead.username else ''
         result['account_credit'] = lead.account_credit if lead.account_credit else 25
+        result['monthly_usage'] = lead.monthly_usage
+        result['number_of_dids'] = lead.number_of_dids
+        result['potential'] = lead.potential
+        result['current_service'] = lead.current_service
+        result['under_contract'] = lead.under_contract
+        result['valid_use_case'] = lead.valid_use_case
+        result['share_rates'] = lead.share_rates
+        result['buying_motivation'] = lead.buying_motivation
+        result['decision_maker'] = lead.decision_maker
+        result['current_messaging_platform'] = lead.current_messaging_platform
+        result['interface_preference'] = lead.interface_preference
+        result['voice_config'] = lead.voice_config
+        result['customizations'] = lead.customizations
+        result['known_issues'] = lead.known_issues
 
         return result
 
@@ -113,6 +130,10 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 known_issues=self.known_issues if self.known_issues else 'N/A')
 
         lead = self.env['crm.lead'].browse(self._context['active_id'])
+
+        # the "potential" constrains has ensured that the value is a number
+        lead.planned_revenue = int(self.potential)
+
         lead.username = self.username
         lead.account_credit = self.account_credit
         lead.monthly_usage = self.monthly_usage
@@ -127,8 +148,8 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.current_messaging_platform = self.current_messaging_platform
         lead.interface_preference = self.interface_preference
         lead.voice_config = self.voice_config
-        lead.customizations = self.customizations
-        lead.known_issues = self.known_issues
+        lead.customizations = self.customizations if self.customizations else 'N/A'
+        lead.known_issues = self.known_issues if self.known_issues else 'N/A'
 
         _logger.debug("body: %s" % body)
         lead.message_post(body=body, subject="Qualification Answers")
@@ -148,3 +169,11 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         if 'auth_token' in user_response:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
+
+    @api.multi
+    @api.constrains('potential')
+    def _valid_potential_value(self):
+        try:
+            temp = int(self.potential)
+        except ValueError:
+            raise ValidationError('Found non-numeric data in the "What is the potential" answer.')
