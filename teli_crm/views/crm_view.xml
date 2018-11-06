@@ -1,20 +1,22 @@
 <odoo>
     <data>
         <!-- explicit list view definition -->
-        <record id="teli_crm.list" model="ir.ui.view">
+        <record id="teli_crm.crm_case_form_view_leads_inhrtied" model="ir.ui.view">
             <field name="name">teli_crm.list</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//header/button" position="attributes">
-                        <attribute name="string">Convert to Account</attribute>
+                    <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="replace">
+                        <button name="%(crm.action_crm_lead2opportunity_partner)d" string="Convert to Account" type="action"
+                            class="oe_highlight" attrs="{'invisible': [('type', '=', 'convert')]}"/>
                     </xpath>
-                    <xpath expr="//page[@name='extra']" position="after">
-                        <page string="teli Settings">
+                    <xpath expr="//page[last()]" position="after">
+                        <page string="Teli Settings">
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>
+                                <field name="uuid"/>
                             </group>
                             <group string="Qualification Questions" name="qualifications" col="4">
                                 <label for="monthly_usage" colspan="3"/>
@@ -64,6 +66,13 @@
                             </group>
                         </page>
                     </xpath>
+                    <xpath expr="//field[@name='partner_id']" position="attributes">
+                        <attribute name="context">{'default_name': contact_name, 'default_function': function, 'default_phone': phone, 'default_mobile': mobile, 'default_email': email_from, 'default_user_id': user_id, 'default_team_id': team_id, 'default_website': website}</attribute>
+                    </xpath>
+                    <xpath expr="//label[@for='street']/..//div[1]" position="replace">
+                    </xpath>
+                    <xpath expr="//label[@for='street']" position="replace">
+                    </xpath>
                 </data>
             </field>
         </record>
@@ -74,12 +83,25 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
                 <data>
+                    <xpath expr="//page[@name='lead']//field[@name='partner_name']/.." position="before">
+                        <group colspan="2">
+                            <group string="Contacts">
+                                <field name="partner_ids" nolabel="1"/>
+                            </group>
+                            <group string="Leads">
+                                <field name="lead_ids" nolabel="1"/>
+                            </group>
+                        </group>
+                    </xpath>
                     <xpath expr="//page[@name='lead']" position="after">
-                        <page string="teli Info">
+                        <page string="Teli Account Info">
                             <group>
                                 <field name="username" readonly="1"/>
                                 <field name="account_credit" readonly="1"/>
                                 <field name="uuid" readonly="1"/>
+                            </group>
+                            <group string="Contacts">
+                                <field name="partner_ids" nolabel="1"/>
                             </group>
                             <group string="Qualification Questions" name="qualifications" col="4">
                                 <label for="monthly_usage" colspan="3"/>

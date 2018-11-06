@@ -11,6 +11,11 @@ _logger = logging.getLogger(__name__)
 class teli_lead2opportunity_partner(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'
 
+
+
+    name = fields.Selection([('convert', 'Convert to opportunity')], default='convert')
+    partner_ids = fields.Many2many(comodel_name='res.partner', relation='wiz_teli_crm_partnerm2m',
+                                    column1='lead_id', column2='partner_id', string='Contacts')
     # credential fields
     username = fields.Char(string='teli Username', required=True)
     account_credit = fields.Char('Initial Account Credit')
@@ -141,7 +146,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         _logger.debug("body: %s" % body)
         lead.message_post(body=body, subject="Qualification Answers")
-
+        lead.partner_ids = self.partner_ids
         return super().action_apply()
 
     @api.multi
