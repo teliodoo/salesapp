@@ -11,8 +11,11 @@ _logger = logging.getLogger(__name__)
 class teli_lead2opportunity_partner(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'
 
-
-
+    action = fields.Selection([
+        ('exist', 'Link to an existing contact'),
+        ('create', 'Create a new contact'),
+        ('nothing', 'Do not link to a contact')
+    ], 'Related Contact', required=True)
     name = fields.Selection([('convert', 'Convert to opportunity')], default='convert')
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='wiz_teli_crm_partnerm2m',
                                     column1='lead_id', column2='partner_id', string='Contacts')
@@ -127,6 +130,10 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 known_issues=self.known_issues if self.known_issues else 'N/A')
 
         lead = self.env['crm.lead'].browse(self._context['active_id'])
+
+        # the "potential" constrains has ensured that the value is a number
+        lead.planned_revenue = int(self.potential)
+
         lead.username = self.username
         lead.account_credit = self.account_credit
         lead.monthly_usage = self.monthly_usage
@@ -162,3 +169,11 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         if 'auth_token' in user_response:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
+
+    @api.multi
+    @api.constrains('potential')
+    def _valid_potential_value(self):
+        try:
+            temp = int(self.potential)
+        except ValueError:
+            raise ValidationError('Found non-numeric data in the "What is the potential" answer.')

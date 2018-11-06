@@ -12,11 +12,10 @@
                             class="oe_highlight" attrs="{'invisible': [('type', '=', 'convert')]}"/>
                     </xpath>
                     <xpath expr="//page[last()]" position="after">
-                        <page string="Teli Settings">
+                        <page string="teli Account Info">
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>
-                                <field name="uuid"/>
                             </group>
                             <group string="Qualification Questions" name="qualifications" col="4">
                                 <label for="monthly_usage" colspan="3"/>
@@ -93,8 +92,8 @@
                             </group>
                         </group>
                     </xpath>
-                    <xpath expr="//page[@name='lead']" position="after">
-                        <page string="Teli Account Info">
+                    <xpath expr="//page[last()]" position="after">
+                        <page string="teli Account Info">
                             <group>
                                 <field name="username" readonly="1"/>
                                 <field name="account_credit" readonly="1"/>
