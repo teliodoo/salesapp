@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -12,8 +13,6 @@ class teli_crm(models.Model):
 
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
                                     column1='lead_id', column2='partner_id', string='Contacts')
-    lead_ids = fields.Many2many(comodel_name='crm.lead', relation='teli_crm_lead_opp',
-                                    column1='opp_id', column2='lead_id', string='Lead', domain=[('type', '=', 'lead')])
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
@@ -21,7 +20,7 @@ class teli_crm(models.Model):
     # qualification questions
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?')
     number_of_dids = fields.Char(string='How many DIDs are in service?')
-    potential = fields.Char(string='What is the potential?')
+    potential = fields.Char(string='What is the potential revenue?')
     current_service = fields.Char(string='What type of services are they currently using today in their company?')
     under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?')
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
@@ -65,8 +64,7 @@ class teli_crm(models.Model):
             last_name = name_array[-1]
             return first_name, last_name
 
-    @api.multi
-    def handle_partner_assignation(self, action='create', partner_id=False):
+    def _call_signup_user(self):
         # make call get data
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
@@ -101,9 +99,51 @@ class teli_crm(models.Model):
             })
             self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
 
-        return super().handle_partner_assignation(action, partner_id)
+    @api.multi
+    def close_dialog(self):
+        _logger.debug('hit close_dialog')
+        self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
+        _call_signup_user()
+
+        return super().close_dialog()
 
     @api.multi
-    @api.constrains('partner_id')
-    def _check_accounts(self):
-        """ clean up duplications of the partner_id """
+    def edit_dialog(self):
+        _logger.debug('hit edit_dialog')
+        self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
+        _call_signup_user()
+
+        return super().edit_dialog()
+
+    @api.multi
+    def handle_partner_assignation(self, action='create', partner_id=False):
+        _logger.debug('hit handle_partner_assignation')
+        _call_signup_user()
+
+        return super().handle_partner_assignation(action, partner_id)
+
+    # --------------------------------------------------------------------------
+    #   Constrains
+    # --------------------------------------------------------------------------
+
+    @api.multi
+    @api.constrains('username')
+    def _lookup_teli_username(self):
+        teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
+        _logger.debug('calling find_by_username for: %s' % self.username)
+        user_response = teliapi.find_by_username({
+            'token': current_user.teli_token,
+            'username': self.username
+        })
+
+        if 'auth_token' in user_response:
+            raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
+
+    @api.multi
+    @api.constrains('potential')
+    def _valid_potential_value(self):
+        try:
+            temp = int(self.potential)
+        except ValueError:
+            raise ValidationError('"What is the potential revenue?" must be a numeric value.')
