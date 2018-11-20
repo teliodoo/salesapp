@@ -103,7 +103,7 @@ class teli_crm(models.Model):
     def close_dialog(self):
         _logger.debug('hit close_dialog')
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
-        _call_signup_user()
+        self._call_signup_user()
 
         return super().close_dialog()
 
@@ -111,14 +111,14 @@ class teli_crm(models.Model):
     def edit_dialog(self):
         _logger.debug('hit edit_dialog')
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
-        _call_signup_user()
+        self._call_signup_user()
 
         return super().edit_dialog()
 
     @api.multi
     def handle_partner_assignation(self, action='create', partner_id=False):
         _logger.debug('hit handle_partner_assignation')
-        _call_signup_user()
+        self._call_signup_user()
 
         return super().handle_partner_assignation(action, partner_id)
 
