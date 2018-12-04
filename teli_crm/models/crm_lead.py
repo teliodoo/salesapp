@@ -13,6 +13,7 @@ class teli_crm(models.Model):
 
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
                                     column1='lead_id', column2='partner_id', string='Contacts')
+    teli_user_id = fields.Char('teli user id')
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
@@ -44,6 +45,19 @@ class teli_crm(models.Model):
     voice_config = fields.Boolean('Voice configuration uses SIP?', help='No IAX')
     customizations = fields.Text('Any customizations needed?')
     known_issues = fields.Text('Any known issues?')
+
+    invoice_term = fields.Selection([
+            ('none', 'None'),
+            ('30net30', '30 Net 30'),
+            ('30net15', '30 Net 15'),
+            ('30net10', '30 Net 10'),
+            ('30net7', '30 Net 7'),
+            ('30net3', '30 Net 3'),
+            ('15net15', '15 Net 15'),
+            ('7net7', '7 Net 7'),
+            ('7net3', '7 Net 3'),
+            ('generic', 'Generic')
+        ], 'Invoice Terms', default='none')
 
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
@@ -98,6 +112,16 @@ class teli_crm(models.Model):
                 'username': self.username if self.username else "%s.%s" % (first_name, last_name)
             })
             self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
+            self.teli_user_id = user_response['id'] if 'id' in user_response else ''
+
+    def _call_fetch_user(self):
+        teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
+        _logger.debug('calling find_by_username for: %s' % self.username)
+        return teliapi.find_by_username({
+            'token': current_user.teli_token,
+            'username': self.username
+        })
 
     @api.multi
     def close_dialog(self):
@@ -122,6 +146,36 @@ class teli_crm(models.Model):
 
         return super().handle_partner_assignation(action, partner_id)
 
+    @api.onchange('invoice_term')
+    def _onchange_invoice_term(self):
+        teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
+
+        # If the account was created before the addition of invoice_term, then
+        # attempt to get the teli_user_id from the API.
+        if not self.teli_user_id:
+            result = self._call_fetch_user()
+            if 'id' in result:
+                self.uuid = result['auth_token'] if 'auth_token' in result else ''
+                self.teli_user_id = result['id'] if 'id' in result else ''
+            else:
+                return {
+                    'warning': {
+                        'title': 'Unable to Find User',
+                        'message': 'Could not set invoice term'
+                    }
+                }
+
+        response = teliapi.set_invoice_term({
+            'user_id': self.teli_user_id,
+            'invoice_term': self.invoice_term,
+            'token': current_user.teli_token
+        })
+
+        if response['status'] is not 'success':
+            self.message_post(subject='teli API Warning',
+                body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
+
     # --------------------------------------------------------------------------
     #   Constrains
     # --------------------------------------------------------------------------
@@ -129,13 +183,7 @@ class teli_crm(models.Model):
     @api.multi
     @api.constrains('username')
     def _lookup_teli_username(self):
-        teliapi = self.env['teliapi.teliapi']
-        current_user = self.env['res.users'].browse(self.user_id.id)
-        _logger.debug('calling find_by_username for: %s' % self.username)
-        user_response = teliapi.find_by_username({
-            'token': current_user.teli_token,
-            'username': self.username
-        })
+        user_response = self._call_fetch_user()
 
         if 'auth_token' in user_response:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)

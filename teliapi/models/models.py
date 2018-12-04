@@ -35,6 +35,16 @@ class teliapi(models.Model):
         return Teliapi.find_by_username(params)
 
     @api.multi
+    def set_invoice_term(self, params):
+        """ set_invoice_term - set the invoice term in teli
+            params:
+             - token
+             - user_id
+             - invoice_term
+        """
+        return Teliapi.set_invoice_term(params)
+
+    @api.multi
     def get_user(self):
         """ get_user: tries the user information for a given token.
             Sample Reply: {
