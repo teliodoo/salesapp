@@ -124,6 +124,16 @@ class Teliapi(http.Controller):
         return {}
 
     @classmethod
+    def set_invoice_term(self, params):
+        response = self._call('/user/terms/set', {
+            'user_id': params['user_id'],
+            'terms': params['invoice_term'],
+            'token': params['token']
+        })
+
+        return response
+
+    @classmethod
     def get_user(self):
         """ get_user - Attempts to retrieve the user from teli_api
             returns: a json structure

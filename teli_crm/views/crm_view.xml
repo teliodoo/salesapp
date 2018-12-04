@@ -95,6 +95,7 @@
                                 <field name="username" readonly="1"/>
                                 <field name="account_credit" readonly="1"/>
                                 <field name="uuid" readonly="1"/>
+                                <field name="invoice_term"/>
                             </group>
                             <group string="Contacts">
                                 <field name="partner_ids" nolabel="1"/>
