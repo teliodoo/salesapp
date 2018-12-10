@@ -7,6 +7,9 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
                 <data>
+                    <xpath expr="//field[@name='partner_name']" position="replace">
+                        <field name="teli_company_name"/>
+                    </xpath>
                     <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="replace">
                         <button name="%(crm.action_crm_lead2opportunity_partner)d" string="Convert to Account" type="action"
                             class="oe_highlight" attrs="{'invisible': [('type', '=', 'convert')]}"/>
@@ -82,6 +85,9 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
                 <data>
+                    <xpath expr="//field[@name='partner_id']" position="after">
+                        <field name="teli_company_name"/>
+                    </xpath>
                     <xpath expr="//page[@name='lead']//field[@name='partner_name']/.." position="before">
                         <group colspan="2">
                             <group string="Contacts" colspan="2">

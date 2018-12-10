@@ -14,6 +14,7 @@ class teli_crm(models.Model):
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
                                     column1='lead_id', column2='partner_id', string='Contacts')
     teli_user_id = fields.Char('teli user id')
+    teli_company_name = fields.Char('Company Name')
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
@@ -91,7 +92,7 @@ class teli_crm(models.Model):
             'phone': self.mobile if self.mobile else self.phone,
             'email': self.email_from,
             'username': self.username if self.username else "%s.%s" % (first_name, last_name),
-            'company_name': self.partner_name,
+            'company_name': self.teli_company_name,
             'credit': self.account_credit,
             'token': current_user.teli_token,
         }
@@ -195,3 +196,11 @@ class teli_crm(models.Model):
             temp = int(self.potential)
         except ValueError:
             raise ValidationError('"What is the potential revenue?" must be a numeric value.')
+
+    # @api.multi
+    # @api.constrains('email_from')
+    # def _validate_new_email(self):
+    #     contact = self.env['res.partner'].search([('email', '=', self.email_from)])
+    #     _logger.debug(contact)
+    #     if contact:
+    #         raise ValidationError('That email already exists in the system.  Please "Create an Opportunity" instead of a lead.')
