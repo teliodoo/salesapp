@@ -66,13 +66,6 @@ class Teliapi(http.Controller):
             'token': params['token'],
         }
 
-        # debugging the return
-        # return {
-        #     "code": 200,
-        #     "status": "success",
-        #     "data": "[DEBUG] An account was not created"
-        # }
-
         for key, value in request_params.items():
             _logger.debug("%s => %s" % (key, value))
 
@@ -83,8 +76,16 @@ class Teliapi(http.Controller):
         if new_username:
             request_params['username'] = new_username
 
+        # debugging the return
+        # return {
+        #     "code": 200,
+        #     "status": "success",
+        #     "data": "[DEBUG] An account was not created"
+        # }
+
         response = self._call('/sales/create_customer', request_params)
 
+        _logger.info("[%s] CreateUser Signup: %s" % (response['code'], response['data']))
         if response['code'] is 400 and response['data'] is 'Username already in use':
             # FIXME this is untested, and shouldn't be necessary because the associate can set the username in the CRM.
             # username error
