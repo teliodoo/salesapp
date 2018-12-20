@@ -60,6 +60,9 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         lead = self.env['crm.lead'].browse(self._context['active_id'])
 
+        if not lead.phone and not lead.mobile:
+            raise ValidationError("Fill in at least one of the following fields: 'Phone' or 'Mobile'")
+
         result['action'] = 'create'
         result['username'] = lead.username if lead.username else ''
         result['account_credit'] = lead.account_credit if lead.account_credit else 25
