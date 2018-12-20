@@ -55,8 +55,12 @@ class teli_lead2opportunity_partner(models.TransientModel):
     def default_get(self, fields):
         """ Set the default values for teli username and initial account credit """
         result = super().default_get(fields)
+        if 'name' in result and result['name'] == 'merge':
+            result['name'] = 'convert'
+
         lead = self.env['crm.lead'].browse(self._context['active_id'])
 
+        result['action'] = 'create'
         result['username'] = lead.username if lead.username else ''
         result['account_credit'] = lead.account_credit if lead.account_credit else 25
         result['monthly_usage'] = lead.monthly_usage

@@ -57,7 +57,8 @@ class teli_crm(models.Model):
             ('15net15', '15 Net 15'),
             ('7net7', '7 Net 7'),
             ('7net3', '7 Net 3'),
-            ('generic', 'Generic')
+            ('generic', 'Generic'),
+            ('teli', 'teli Test Account')
         ], 'Invoice Terms', default='none')
 
     def _format_name(self, name):
@@ -143,9 +144,11 @@ class teli_crm(models.Model):
     @api.multi
     def handle_partner_assignation(self, action='create', partner_id=False):
         _logger.debug('hit handle_partner_assignation')
+        result = super().handle_partner_assignation(action, partner_id)
+        _logger.debug('the parent completed, and now we can create the user on teli')
         self._call_signup_user()
 
-        return super().handle_partner_assignation(action, partner_id)
+        return result
 
     @api.onchange('invoice_term')
     def _onchange_invoice_term(self):
