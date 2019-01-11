@@ -30,7 +30,7 @@
         # 'security/ir.model.access.csv',
         'views/crm_view.xml',
         'views/templates.xml',
-
+        'views/teli_invoice.xml',
         'wizard/lead_to_opportunity.xml',
     ],
     # only loaded in demonstration mode

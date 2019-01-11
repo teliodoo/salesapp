@@ -8,11 +8,12 @@ _logger = logging.getLogger(__name__)
 # uncomment for debugging
 # _logger.setLevel('DEBUG')
 
+
 class teli_crm(models.Model):
     _inherit = 'crm.lead'
 
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
-                                    column1='lead_id', column2='partner_id', string='Contacts')
+                                   column1='lead_id', column2='partner_id', string='Contacts')
     teli_user_id = fields.Char('teli user id')
     teli_company_name = fields.Char('Company Name')
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
@@ -38,7 +39,7 @@ class teli_crm(models.Model):
         ], 'Who is personally overseeing the implementation?',
         help='Give an overview of the expectations of the next call and the ideal outcome.')
     current_messaging_platform = fields.Char('Current Messaging Platform?',
-        help='Is it compatible with XMPP, SMPP, or web services?')
+                                             help='Is it compatible with XMPP, SMPP, or web services?')
     interface_preference = fields.Selection([
             ('api', 'API'),
             ('portal', 'Portal')
@@ -60,6 +61,8 @@ class teli_crm(models.Model):
             ('generic', 'Generic'),
             ('teli', 'teli Test Account')
         ], 'Invoice Terms', default='none')
+
+    invoices = fields.One2many(comodel_name='teli.invoice', inverse_name='crm_lead_id', string='Invoice Aggregate')
 
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
@@ -103,10 +106,10 @@ class teli_crm(models.Model):
         # Check the response and set a note if the call was successful or not
         if create_response['code'] is not 200:
             self.message_post(content_subtype='plaintext', subject='teli API Warning',
-                body='[WARNING] Received the following error from teli: %s' % create_response['data'])
+                              body='[WARNING] Received the following error from teli: %s' % create_response['data'])
         else:
             self.message_post(content_subtype='plaintext', subject='teli API Note',
-                body='[SUCCESS] New account was successfully created.')
+                              body='[SUCCESS] New account was successfully created.')
 
             # if success, try to grab the uuid and update the oppr/acct
             user_response = teliapi.find_by_username({
@@ -178,7 +181,7 @@ class teli_crm(models.Model):
 
         if response['status'] is not 'success':
             self.message_post(subject='teli API Warning',
-                body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
+                              body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
 
     # --------------------------------------------------------------------------
     #   Constrains
@@ -199,11 +202,3 @@ class teli_crm(models.Model):
             temp = int(self.potential)
         except ValueError:
             raise ValidationError('"What is the potential revenue?" must be a numeric value.')
-
-    # @api.multi
-    # @api.constrains('email_from')
-    # def _validate_new_email(self):
-    #     contact = self.env['res.partner'].search([('email', '=', self.email_from)])
-    #     _logger.debug(contact)
-    #     if contact:
-    #         raise ValidationError('That email already exists in the system.  Please "Create an Opportunity" instead of a lead.')
