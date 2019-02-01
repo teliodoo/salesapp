@@ -61,8 +61,18 @@ class teli_crm(models.Model):
             ('generic', 'Generic'),
             ('teli', 'teli Test Account')
         ], 'Invoice Terms', default='none')
+    offnet_dids = fields.Boolean('Enable Offnet DIDs?')
+    inbound_channel_limit = fields.Integer('Inbound Channel Limit')
+    outbound_channel_limit = fields.Integer('Outbound Channel Limit')
+    international_sms = fields.Boolean('Enable International SMS?')
+    usf_exempt = fields.Boolean('USF Exempt')
+    white_labeling = fields.Boolean('Reselling/White Labeling our Services')
 
     invoices = fields.One2many(comodel_name='teli.invoice', inverse_name='crm_lead_id', string='Invoice Aggregate')
+    products = fields.Many2many('teli.products', 'teli_crm_products_rel', 'crm_lead_id', 'product_id',
+                                string="Product Areas of Inital Use")
+    gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
+                                string="Gateways Needed")
 
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
@@ -202,3 +212,28 @@ class teli_crm(models.Model):
             temp = int(self.potential)
         except ValueError:
             raise ValidationError('"What is the potential revenue?" must be a numeric value.')
+
+
+class TeliProducts(models.Model):
+    """ Questions:
+        - Is there a better way to ensure no duplicate m2m options on reload than a sql constrains?
+        - How do I clean up the data in the database?
+        - how do/can I define alt string values for m2m options?
+    """
+    _name = 'teli.products'
+
+    name = fields.Char('Name', required=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', "Tag name already exists !"),
+    ]
+
+
+class Gateways(models.Model):
+    _name = 'teli.gateways'
+
+    name = fields.Char('Name', required=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', "Tag name already exists !"),
+    ]

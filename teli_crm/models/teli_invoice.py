@@ -15,7 +15,7 @@ class TeliInvoice(models.Model):
 
     # Channel Groups ----------------------------------------------------------------------
     channel_groups_qty = fields.Integer('Channel Groups Quantity', default=0)
-    channel_groups_price = fields.Float('Channel Groups Price', digits=(13, 6))
+    channel_groups_price = fields.Float('Channel Groups Price', digits=(13, 6), default=0.0)
     channel_groups_amount = fields.Float('Channel Groups Amount', compute='_compute_cg_amount')
 
     @api.one
@@ -25,7 +25,7 @@ class TeliInvoice(models.Model):
 
     # Local Numbers ----------------------------------------------------------------------
     local_numbers = fields.Integer('Local Numbers', default=0)
-    local_numbers_price = fields.Float('Local Numbers Price', digits=(13, 6))
+    local_numbers_price = fields.Float('Local Numbers Price', digits=(13, 6), default=0.0)
     local_numbers_amount = fields.Float('Local Numbers Amount', compute='_compute_ln_amount')
 
     @api.one
@@ -35,7 +35,7 @@ class TeliInvoice(models.Model):
 
     # Tollfree Numbers ----------------------------------------------------------------------
     tollfree_numbers = fields.Integer('Tollfree Numbers', default=0)
-    tollfree_numbers_price = fields.Float('Tollfree Numbers Price', digits=(13, 6))
+    tollfree_numbers_price = fields.Float('Tollfree Numbers Price', digits=(13, 6), default=0.0)
     tollfree_numbers_amount = fields.Float('Tollfree Numbers Amount', compute='_compute_tf_amount')
 
     @api.one
@@ -45,7 +45,7 @@ class TeliInvoice(models.Model):
 
     # Offnet Numbers ----------------------------------------------------------------------
     offnet_numbers = fields.Integer('Offnet Numbers', default=0)
-    offnet_numbers_price = fields.Float('Offnet Numbers Price', digits=(13, 6))
+    offnet_numbers_price = fields.Float('Offnet Numbers Price', digits=(13, 6), default=0.0)
     offnet_numbers_amount = fields.Float('Offnet Numbers Amount', compute='_compute_onn_amount')
 
     @api.one
@@ -55,7 +55,7 @@ class TeliInvoice(models.Model):
 
     # International Numbers ----------------------------------------------------------------------
     international_numbers = fields.Integer('International Numbers', default=0)
-    international_numbers_price = fields.Float('International Numbers Price', digits=(13, 6))
+    international_numbers_price = fields.Float('International Numbers Price', digits=(13, 6), default=0.0)
     international_numbers_amount = fields.Float('International Numbers Amount', compute='_compute_intl_amount')
 
     @api.one
@@ -65,7 +65,7 @@ class TeliInvoice(models.Model):
 
     # LNP Requests ----------------------------------------------------------------------
     lnp_requests = fields.Integer('LNP Requests', default=0)
-    lnp_requests_price = fields.Float('LNP Requests Price', digits=(13, 6))
+    lnp_requests_price = fields.Float('LNP Requests Price', digits=(13, 6), default=0.0)
     lnp_requests_amount = fields.Float('LNP Requests Amount', compute='_compute_lnp_amount')
 
     @api.one
@@ -75,7 +75,7 @@ class TeliInvoice(models.Model):
 
     # Minutes Inbound ----------------------------------------------------------------------
     minutes_inbound = fields.Integer('Minutes Inbound', default=0)
-    minutes_inbound_price = fields.Float('Minutes Inbound Price', digits=(13, 6))
+    minutes_inbound_price = fields.Float('Minutes Inbound Price', digits=(13, 6), default=0.0)
     minutes_inbound_amount = fields.Float('Minutes Inbound Amount', compute='_compute_min_in_amount')
 
     @api.one
@@ -85,7 +85,7 @@ class TeliInvoice(models.Model):
 
     # Minutes Outbound ----------------------------------------------------------------------
     minutes_outbound = fields.Integer('Minutes Outbound', default=0)
-    minutes_outbound_price = fields.Float('Minutes Outbound Price', digits=(13, 6))
+    minutes_outbound_price = fields.Float('Minutes Outbound Price', digits=(13, 6), default=0.0)
     minutes_outbound_amount = fields.Float('Minutes Outbound Amount', compute='_compute_min_out_amount')
 
     @api.one
@@ -95,7 +95,7 @@ class TeliInvoice(models.Model):
 
     # SIP/Nav Minutes Outbound ----------------------------------------------------------------------
     sipnav_minutes_outbound = fields.Integer('SIPNav Minutes Outbound', default=0)
-    sipnav_minutes_outbound_price = fields.Float('SIPNav Minutes Outbound Price', digits=(13, 6))
+    sipnav_minutes_outbound_price = fields.Float('SIPNav Minutes Outbound Price', digits=(13, 6), default=0.0)
     sipnav_minutes_outbound_amount = fields.Float('SIPNav Minutes Outbound Amount', compute='_compute_sipnav_amount')
 
     @api.one
@@ -105,7 +105,7 @@ class TeliInvoice(models.Model):
 
     # Local SMS Inbound ----------------------------------------------------------------------
     local_sms_in = fields.Integer('Local SMS Inbound', default=0)
-    local_sms_in_price = fields.Float('Local SMS Inbound Price', digits=(13, 6))
+    local_sms_in_price = fields.Float('Local SMS Inbound Price', digits=(13, 6), default=0.0)
     local_sms_in_amount = fields.Float('Local SMS Inbound Amount', compute='_compute_local_sms_in_amount')
 
     @api.one
@@ -115,7 +115,7 @@ class TeliInvoice(models.Model):
 
     # Local SMS Outbound ----------------------------------------------------------------------
     local_sms_out = fields.Integer('Local SMS Outbound', default=0)
-    local_sms_out_price = fields.Float('Local SMS Outbound Price', digits=(13, 6))
+    local_sms_out_price = fields.Float('Local SMS Outbound Price', digits=(13, 6), default=0.0)
     local_sms_out_amount = fields.Float('Local SMS Outbound Amount', compute='_compute_local_sms_out_amount')
 
     @api.one
@@ -125,7 +125,7 @@ class TeliInvoice(models.Model):
 
     # Local MMS Inbound ----------------------------------------------------------------------
     local_mms_in = fields.Integer('Local MMS Inbound', default=0)
-    local_mms_in_price = fields.Float('Local MMS Inbound Price', digits=(13, 6))
+    local_mms_in_price = fields.Float('Local MMS Inbound Price', digits=(13, 6), default=0.0)
     local_mms_in_amount = fields.Float('Local MMS Inbound Amount', compute='_compute_local_mms_in_amount')
 
     @api.one
@@ -135,7 +135,7 @@ class TeliInvoice(models.Model):
 
     # Local MMS Outbound ----------------------------------------------------------------------
     local_mms_out = fields.Integer('Local MMS Outbound', default=0)
-    local_mms_out_price = fields.Float('Local MMS Outbound Price', digits=(13, 6))
+    local_mms_out_price = fields.Float('Local MMS Outbound Price', digits=(13, 6), default=0.0)
     local_mms_out_amount = fields.Float('Local MMS Outbound Amount', compute='_compute_local_mms_out_amount')
 
     @api.one
@@ -145,7 +145,7 @@ class TeliInvoice(models.Model):
 
     # Shortcode SMS Inbound ----------------------------------------------------------------------
     sc_sms_in = fields.Integer('Shortcode SMS Inbound', default=0)
-    sc_sms_in_price = fields.Float('Shortcode SMS Inbound Price', digits=(13, 6))
+    sc_sms_in_price = fields.Float('Shortcode SMS Inbound Price', digits=(13, 6), default=0.0)
     sc_sms_in_amount = fields.Float('Shortcode SMS Inbound Amount', compute='_compute_sc_sms_in_amount')
 
     @api.one
@@ -155,7 +155,7 @@ class TeliInvoice(models.Model):
 
     # Shortcode SMS Outbound ----------------------------------------------------------------------
     sc_sms_out = fields.Integer('Shortcode SMS Outbound', default=0)
-    sc_sms_out_price = fields.Float('Shortcode SMS Outbound Price', digits=(13, 6))
+    sc_sms_out_price = fields.Float('Shortcode SMS Outbound Price', digits=(13, 6), default=0.0)
     sc_sms_out_amount = fields.Float('Shortcode SMS Outbound Amount', compute='_compute_sc_sms_out_amount')
 
     @api.one
@@ -165,7 +165,7 @@ class TeliInvoice(models.Model):
 
     # Shortcode MMS Inbound ----------------------------------------------------------------------
     sc_mms_in = fields.Integer('Shortcode MMS Inbound', default=0)
-    sc_mms_in_price = fields.Float('Shortcode MMS Inbound Price', digits=(13, 6))
+    sc_mms_in_price = fields.Float('Shortcode MMS Inbound Price', digits=(13, 6), default=0.0)
     sc_mms_in_amount = fields.Float('Shortcode MMS Inbound Amount', compute='_compute_sc_mms_in_amount')
 
     @api.one
@@ -175,7 +175,7 @@ class TeliInvoice(models.Model):
 
     # Shortcode MMS Outbound ----------------------------------------------------------------------
     sc_mms_out = fields.Integer('Shortcode MMS Outbound', default=0)
-    sc_mms_out_price = fields.Float('Shortcode MMS Outbound Price', digits=(13, 6))
+    sc_mms_out_price = fields.Float('Shortcode MMS Outbound Price', digits=(13, 6), default=0.0)
     sc_mms_out_amount = fields.Float('Shortcode MMS Outbound Amount', compute='_compute_sc_mms_out_amount')
 
     @api.one
@@ -185,7 +185,7 @@ class TeliInvoice(models.Model):
 
     # Tollfree SMS Inbound ----------------------------------------------------------------------
     tf_sms_in = fields.Integer('Tollfree SMS Inbound', default=0)
-    tf_sms_in_price = fields.Float('Tollfree SMS Inbound Price', digits=(13, 6))
+    tf_sms_in_price = fields.Float('Tollfree SMS Inbound Price', digits=(13, 6), default=0.0)
     tf_sms_in_amount = fields.Float('Tollfree SMS Inbound Amount', compute='_compute_tf_sms_in_amount')
 
     @api.one
@@ -195,7 +195,7 @@ class TeliInvoice(models.Model):
 
     # Tollfree SMS Outbound ----------------------------------------------------------------------
     tf_sms_out = fields.Integer('Tollfree SMS Outbound', default=0)
-    tf_sms_out_price = fields.Float('Tollfree SMS Outbound Price', digits=(13, 6))
+    tf_sms_out_price = fields.Float('Tollfree SMS Outbound Price', digits=(13, 6), default=0.0)
     tf_sms_out_amount = fields.Float('Tollfree SMS Outbound Amount', compute='_compute_tf_sms_out_amount')
 
     @api.one
@@ -205,7 +205,7 @@ class TeliInvoice(models.Model):
 
     # Tollfree MMS Inbound ----------------------------------------------------------------------
     tf_mms_in = fields.Integer('Tollfree MMS Inbound', default=0)
-    tf_mms_in_price = fields.Float('Tollfree MMS Inbound Price', digits=(13, 6))
+    tf_mms_in_price = fields.Float('Tollfree MMS Inbound Price', digits=(13, 6), default=0.0)
     tf_mms_in_amount = fields.Float('Tollfree MMS Inbound Amount', compute='_compute_tf_mms_in_amount')
 
     @api.one
@@ -215,7 +215,7 @@ class TeliInvoice(models.Model):
 
     # Tollfree MMS Outbound ----------------------------------------------------------------------
     tf_mms_out = fields.Integer('Tollfree MMS Outbound', default=0)
-    tf_mms_out_price = fields.Float('Tollfree MMS Outbound Price', digits=(13, 6))
+    tf_mms_out_price = fields.Float('Tollfree MMS Outbound Price', digits=(13, 6), default=0.0)
     tf_mms_out_amount = fields.Float('Tollfree MMS Outbound Amount', compute='_compute_tf_mms_out_amount')
 
     @api.one
@@ -225,7 +225,7 @@ class TeliInvoice(models.Model):
 
     # International SMS Inbound ----------------------------------------------------------------------
     intl_sms_in = fields.Integer('International SMS Inbound', default=0)
-    intl_sms_in_price = fields.Float('International SMS Inbound Price', digits=(13, 6))
+    intl_sms_in_price = fields.Float('International SMS Inbound Price', digits=(13, 6), default=0.0)
     intl_sms_in_amount = fields.Float('International SMS Inbound Amount', compute='_compute_intl_sms_in_amount')
 
     @api.one
@@ -235,7 +235,7 @@ class TeliInvoice(models.Model):
 
     # International SMS Outbound ----------------------------------------------------------------------
     intl_sms_out = fields.Integer('International SMS Outbound', default=0)
-    intl_sms_out_price = fields.Float('International SMS Outbound Price', digits=(13, 6))
+    intl_sms_out_price = fields.Float('International SMS Outbound Price', digits=(13, 6), default=0.0)
     intl_sms_out_amount = fields.Float('International SMS Outbound Amount', compute='_compute_intl_sms_out_amount')
 
     @api.one
@@ -245,7 +245,7 @@ class TeliInvoice(models.Model):
 
     # International MMS Inbound ----------------------------------------------------------------------
     intl_mms_in = fields.Integer('International MMS Inbound', default=0)
-    intl_mms_in_price = fields.Float('International MMS Inbound Price', digits=(13, 6))
+    intl_mms_in_price = fields.Float('International MMS Inbound Price', digits=(13, 6), default=0.0)
     intl_mms_in_amount = fields.Float('International MMS Inbound Amount', compute='_compute_intl_mms_in_amount')
 
     @api.one
@@ -255,7 +255,7 @@ class TeliInvoice(models.Model):
 
     # International MMS Outbound ----------------------------------------------------------------------
     intl_mms_out = fields.Integer('International MMS Outbound', default=0)
-    intl_mms_out_price = fields.Float('International MMS Outbound Price', digits=(13, 6))
+    intl_mms_out_price = fields.Float('International MMS Outbound Price', digits=(13, 6), default=0.0)
     intl_mms_out_amount = fields.Float('International MMS Outbound Amount', compute='_compute_intl_mms_out_amount')
 
     @api.one
@@ -265,7 +265,7 @@ class TeliInvoice(models.Model):
 
     # Emergency 911 Service ----------------------------------------------------------------------
     e911 = fields.Integer('911 Service', default=0)
-    e911_price = fields.Float('911 Service Price', digits=(13, 6))
+    e911_price = fields.Float('911 Service Price', digits=(13, 6), default=0.0)
     e911_amount = fields.Float('911 Service Amount', compute='_compute_e911_amount')
 
     @api.one

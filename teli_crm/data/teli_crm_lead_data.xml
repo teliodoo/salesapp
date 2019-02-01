@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+        <!-- teli.products options -->
+        <record id="teli_crm_products_local" model="teli.products">
+            <field name="name">DIDs - Local</field>
+        </record>
+        <record id="teli_crm_products_tollfree" model="teli.products">
+            <field name="name">DIDs - Toll Free</field>
+        </record>
+        <record id="teli_crm_products_intl" model="teli.products">
+            <field name="name">DIDs - International</field>
+        </record>
+        <record id="teli_crm_products_wt" model="teli.products">
+            <field name="name">Wholesale Termination</field>
+        </record>
+        <record id="teli_crm_products_tt" model="teli.products">
+            <field name="name">Toll Free Termination</field>
+        </record>
+        <record id="teli_crm_products_8yy" model="teli.products">
+            <field name="name">8YY</field>
+        </record>
+        <record id="teli_crm_products_sms" model="teli.products">
+            <field name="name">SMS</field>
+        </record>
+        <record id="teli_crm_products_mms" model="teli.products">
+            <field name="name">MMS</field>
+        </record>
+        <record id="teli_crm_products_shortcode" model="teli.products">
+            <field name="name">Shortcode</field>
+        </record>
+        <record id="teli_crm_products_offnet" model="teli.products">
+            <field name="name">Offnet SMS Enablement</field>
+        </record>
+        <record id="teli_crm_products_cg" model="teli.products">
+            <field name="name">Channel Groups</field>
+        </record>
+        <record id="teli_crm_products_fax" model="teli.products">
+            <field name="name">Faxing</field>
+        </record>
+        <record id="teli_crm_products_e911" model="teli.products">
+            <field name="name">e911</field>
+        </record>
+        <record id="teli_crm_products_cnam" model="teli.products">
+            <field name="name">CNAM</field>
+        </record>
+        <record id="teli_crm_products_colocation" model="teli.products">
+            <field name="name">Co-location - Server Slices</field>
+        </record>
+
+        <!-- teli.gateway options -->
+        <record id="teli_crm_gateways_smpp" model="teli.gateways">
+            <field name="name">SMPP</field>
+        </record>
+        <record id="teli_crm_gateways_api" model="teli.gateways">
+            <field name="name">API</field>
+        </record>
+        <record id="teli_crm_gateways_wt" model="teli.gateways">
+            <field name="name">Wholesale Termination</field>
+        </record>
+        <record id="teli_crm_gateways_restcomm" model="teli.gateways">
+            <field name="name">Restcomm</field>
+        </record>
+        <record id="teli_crm_gateways_vpn" model="teli.gateways">
+            <field name="name">VPN</field>
+            <field name="description">Special cases only</field>
+        </record>
+    </data>
+</odoo>

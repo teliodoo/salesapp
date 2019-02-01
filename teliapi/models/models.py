@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, api
 from odoo.addons.teliapi.controllers.controllers import Teliapi
 import logging
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
 # _logger.setLevel('DEBUG')
+
 
 class teliapi(models.Model):
     _name = "teliapi.teliapi"

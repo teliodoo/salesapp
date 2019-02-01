@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_teli_crm_teli_crm,teli_crm.teli_crm,model_teli_crm_teli_crm,,1,0,0,0
+access_teli_gateways,access_teli_gateways,model_teli_gateways,base.group_user,1,0,0,0
+access_teli_invoice,access_teli_invoice,model_teli_invoice,base.group_user,1,0,0,0
+access_teli_products,access_teli_products,model_teli_products,base.group_user,1,0,0,0
