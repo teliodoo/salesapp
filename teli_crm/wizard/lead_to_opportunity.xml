@@ -7,6 +7,18 @@
             <field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner"/>
             <field name="arch" type="xml">
                 <data>
+                    <xpath expr="//field[@name='name']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                        <attribute name="force_save">1</attribute>
+                    </xpath>
+                    <xpath expr="//group[@name='action']" position="attributes">
+                        <attribute name="string">Contacts</attribute>
+                    </xpath>
+                    <xpath expr="//field[@name='partner_id']" position="replace">
+                            <field name="partner_ids"
+                                attrs="{'required': [('action', '=', 'exist')], 'invisible':[('action','!=','exist')]}"
+                                nolabel="1" colspan="2"/>
+                    </xpath>
                     <xpath expr="//group[@name='action']" position="after">
                         <group string="Account Credential Information" name="credential">
                             <field name="username"/>

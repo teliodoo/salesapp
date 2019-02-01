@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, api
 from odoo.addons.teliapi.controllers.controllers import Teliapi
 import logging
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
 # _logger.setLevel('DEBUG')
+
 
 class teliapi(models.Model):
     _name = "teliapi.teliapi"
@@ -33,6 +34,16 @@ class teliapi(models.Model):
              - username
         """
         return Teliapi.find_by_username(params)
+
+    @api.multi
+    def set_invoice_term(self, params):
+        """ set_invoice_term - set the invoice term in teli
+            params:
+             - token
+             - user_id
+             - invoice_term
+        """
+        return Teliapi.set_invoice_term(params)
 
     @api.multi
     def get_user(self):

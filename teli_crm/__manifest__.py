@@ -27,11 +27,12 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
+        'security/ir.model.access.csv',
+        'views/crm_view.xml',
         'views/templates.xml',
-
+        'views/teli_invoice.xml',
         'wizard/lead_to_opportunity.xml',
+        'data/teli_crm_lead_data.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

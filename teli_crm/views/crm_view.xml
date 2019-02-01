@@ -1,0 +1,254 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+        <record id="teli_crm.crm_case_form_view_leads_inhrtied" model="ir.ui.view">
+            <field name="name">teli_crm.list</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='partner_name']" position="replace">
+                        <field name="teli_company_name"/>
+                    </xpath>
+                    <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="replace">
+                        <button name="%(crm.action_crm_lead2opportunity_partner)d" string="Convert to Account" type="action"
+                            class="oe_highlight" attrs="{'invisible': [('type', '=', 'convert')]}"/>
+                    </xpath>
+                    <xpath expr="//page[last()]" position="after">
+                        <page string="teli Account Info">
+                            <group>
+                                <field name="username"/>
+                                <field name="account_credit"/>
+                                <field name="inbound_channel_limit"/>
+                                <field name="outbound_channel_limit"/>
+                                <field name="offnet_dids"/>
+                                <field name="international_sms"/>
+                                <field name="usf_exempt"/>
+                                <field name="white_labeling"/>
+                                <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                            </group>
+                            <group string="Qualification Questions" name="qualifications" col="4">
+                                <label for="monthly_usage" colspan="3"/>
+                                <field name="monthly_usage" colspan="1" nolabel="1"/>
+
+                                <label for="number_of_dids" colspan="3"/>
+                                <field name="number_of_dids" colspan="1" nolabel="1"/>
+
+                                <label for="potential" colspan="3"/>
+                                <field name="potential" colspan="1" nolabel="1"/>
+
+                                <label for="current_service" colspan="3"/>
+                                <field name="current_service" colspan="1" nolabel="1"/>
+
+                                <label for="under_contract" colspan="3"/>
+                                <field name="under_contract" colspan="1" nolabel="1"/>
+
+                                <label for="valid_use_case" colspan="3"/>
+                                <field name="valid_use_case" colspan="1" nolabel="1"/>
+
+                                <label for="share_rates" colspan="3"/>
+                                <field name="share_rates" colspan="1" nolabel="1"/>
+
+                                <label for="buying_motivation" colspan="3"/>
+                                <field name="buying_motivation" colspan="1" nolabel="1"/>
+
+                                <label for="decision_maker" colspan="3"/>
+                                <field name="decision_maker" colspan="1" nolabel="1"/>
+                            </group>
+                            <group string="Qualified Technical Compatibility" col="4">
+                                <label for="current_messaging_platform" colspan="3"/>
+                                <field name="current_messaging_platform" colspan="1" nolabel="1"/>
+
+                                <label for="interface_preference" colspan="3"/>
+                                <field name="interface_preference" colspan="1" nolabel="1"/>
+
+                                <label for="voice_config" colspan="3"/>
+                                <field name="voice_config" colspan="1" nolabel="1"/>
+
+                                <separator colspan="4"/>
+
+                                <label for="customizations" colspan="1"/>
+                                <field name="customizations" colspan="3" nolabel="1"/>
+
+                                <label for="known_issues" colspan="1"/>
+                                <field name="known_issues" colspan="3" nolabel="1"/>
+                            </group>
+                        </page>
+                    </xpath>
+                    <xpath expr="//field[@name='partner_id']" position="attributes">
+                        <attribute name="context">{'default_name': contact_name, 'default_function': function, 'default_phone': phone, 'default_mobile': mobile, 'default_email': email_from, 'default_user_id': user_id, 'default_team_id': team_id, 'default_website': website}</attribute>
+                    </xpath>
+                    <xpath expr="//label[@for='street']/..//div[1]" position="replace">
+                    </xpath>
+                    <xpath expr="//label[@for='street']" position="replace">
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+        <record id="teli_crm.list_opportunity" model="ir.ui.view">
+            <field name="name">teli_crm.list.opportunity</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='partner_id']" position="after">
+                        <field name="teli_company_name"/>
+                    </xpath>
+                    <xpath expr="//page[@name='lead']//field[@name='partner_name']/.." position="before">
+                        <group colspan="2">
+                            <group string="Contacts" colspan="2">
+                                <field name="partner_ids" nolabel="1"/>
+                            </group>
+                        </group>
+                    </xpath>
+                    <xpath expr="//div[@class='o_address_format']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//label[@for='street']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[last()]" position="after">
+                        <page string="teli Account Info">
+                            <group>
+                                <field name="username" readonly="1"/>
+                                <field name="account_credit" readonly="1"/>
+                                <field name="uuid" readonly="1"/>
+                                <field name="invoice_term"/>
+                                <field name="inbound_channel_limit"/>
+                                <field name="outbound_channel_limit"/>
+                                <field name="offnet_dids"/>
+                                <field name="international_sms"/>
+                                <field name="usf_exempt"/>
+                                <field name="white_labeling"/>
+                                <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                            </group>
+                            <group string="Contacts">
+                                <field name="partner_ids" nolabel="1"/>
+                            </group>
+                            <group string="Qualification Questions" name="qualifications" col="4">
+                                <label for="monthly_usage" colspan="3"/>
+                                <field name="monthly_usage" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="number_of_dids" colspan="3"/>
+                                <field name="number_of_dids" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="potential" colspan="3"/>
+                                <field name="potential" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="current_service" colspan="3"/>
+                                <field name="current_service" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="under_contract" colspan="3"/>
+                                <field name="under_contract" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="valid_use_case" colspan="3"/>
+                                <field name="valid_use_case" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="share_rates" colspan="3"/>
+                                <field name="share_rates" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="buying_motivation" colspan="3"/>
+                                <field name="buying_motivation" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="decision_maker" colspan="3"/>
+                                <field name="decision_maker" colspan="1" nolabel="1" readonly="1"/>
+                            </group>
+                            <group string="Qualified Technical Compatibility" col="4">
+                                <label for="current_messaging_platform" colspan="3"/>
+                                <field name="current_messaging_platform" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="interface_preference" colspan="3"/>
+                                <field name="interface_preference" colspan="1" nolabel="1" readonly="1"/>
+
+                                <label for="voice_config" colspan="3"/>
+                                <field name="voice_config" colspan="1" nolabel="1" readonly="1"/>
+
+                                <separator colspan="4"/>
+
+                                <label for="customizations" colspan="1"/>
+                                <field name="customizations" colspan="3" nolabel="1" readonly="1"/>
+
+                                <label for="known_issues" colspan="1"/>
+                                <field name="known_issues" colspan="3" nolabel="1" readonly="1"/>
+                            </group>
+                        </page>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+        <record id="teli_view_create_opportunity_simplified" model="ir.ui.view">
+            <field name="name">teli.crm.lead.form.simple</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_create_opportunity_simplified"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//sheet/group" position="after">
+                        <group string="teli Account Info">
+                            <field name="username" required="1"/>
+                            <field name="account_credit"/>
+                            <field name="inbound_channel_limit"/>
+                            <field name="outbound_channel_limit"/>
+                            <field name="offnet_dids"/>
+                            <field name="international_sms"/>
+                            <field name="usf_exempt"/>
+                            <field name="white_labeling"/>
+                            <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                            <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                        </group>
+                        <group string="Qualification Questions" name="qualifications" col="4">
+                            <label for="monthly_usage" colspan="3"/>
+                            <field name="monthly_usage" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="number_of_dids" colspan="3"/>
+                            <field name="number_of_dids" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="potential" colspan="3"/>
+                            <field name="potential" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="current_service" colspan="3"/>
+                            <field name="current_service" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="under_contract" colspan="3"/>
+                            <field name="under_contract" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="valid_use_case" colspan="3"/>
+                            <field name="valid_use_case" colspan="1" nolabel="1"/>
+
+                            <label for="share_rates" colspan="3"/>
+                            <field name="share_rates" colspan="1" nolabel="1"/>
+
+                            <label for="buying_motivation" colspan="3"/>
+                            <field name="buying_motivation" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="decision_maker" colspan="3"/>
+                            <field name="decision_maker" colspan="1" nolabel="1" required="1"/>
+                        </group>
+                        <group string="Qualified Technical Compatibility" col="4">
+                            <label for="current_messaging_platform" colspan="3"/>
+                            <field name="current_messaging_platform" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="interface_preference" colspan="3"/>
+                            <field name="interface_preference" colspan="1" nolabel="1" required="1"/>
+
+                            <label for="voice_config" colspan="3"/>
+                            <field name="voice_config" colspan="1" nolabel="1"/>
+
+                            <separator colspan="4"/>
+
+                            <label for="customizations" colspan="1"/>
+                            <field name="customizations" colspan="3" nolabel="1"/>
+
+                            <label for="known_issues" colspan="1"/>
+                            <field name="known_issues" colspan="3" nolabel="1"/>
+                        </group>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+    </data>
+</odoo>
