@@ -220,11 +220,6 @@ class teli_crm(models.Model):
 
 
 class TeliProducts(models.Model):
-    """ Questions:
-        - Is there a better way to ensure no duplicate m2m options on reload than a sql constrains?
-        - How do I clean up the data in the database?
-        - how do/can I define alt string values for m2m options?
-    """
     _name = 'teli.products'
 
     name = fields.Char('Name', required=True)
