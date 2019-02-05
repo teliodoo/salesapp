@@ -98,6 +98,11 @@ class teli_crm(models.Model):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
 
+        # Need to check if the lead was created by the daily cron Job
+        user_check = self._call_fetch_user()
+        if 'id' in user_check and user_check['id'] == self.teli_user_id and 'auth_token' in user_check and user_check['auth_token'] == self.uuid:
+            return False
+
         # attempt to create the account
         first_name, last_name = self._format_name(self.contact_name)
         params = {
@@ -202,7 +207,7 @@ class teli_crm(models.Model):
     def _lookup_teli_username(self):
         user_response = self._call_fetch_user()
 
-        if 'auth_token' in user_response:
+        if 'auth_token' in user_response and user_response['auth_token'] != self.uuid:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
 
     @api.multi

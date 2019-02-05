@@ -42,8 +42,8 @@ class teli_lead2opportunity_partner(models.TransientModel):
             ('individual', 'Individual')
         ], 'Who is personally overseeing the implementation?', required=True,
         help='Give an overview of the expectations of the next call and the ideal outcome.')
-    current_messaging_platform = fields.Char('Current Messaging Platform?',
-        help='Is it compatible with XMPP, SMPP, or web services?', required=True)
+    current_messaging_platform = fields.Char('Current Messaging Platform?', required=True,
+                                             help='Is it compatible with XMPP, SMPP, or web services?')
     interface_preference = fields.Selection([
             ('api', 'API'),
             ('portal', 'Portal')
@@ -170,13 +170,14 @@ class teli_lead2opportunity_partner(models.TransientModel):
     def _lookup_teli_username(self):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
+        current_lead = self.env['crm.lead'].browse(self._context['active_id'])
         _logger.debug('calling find_by_username for: %s' % self.username)
         user_response = teliapi.find_by_username({
             'token': current_user.teli_token,
             'username': self.username
         })
 
-        if 'auth_token' in user_response:
+        if 'auth_token' in user_response and user_response['auth_token'] != current_lead.uuid:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
 
     @api.multi
