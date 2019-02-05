@@ -19,6 +19,14 @@
                             <group>
                                 <field name="username"/>
                                 <field name="account_credit"/>
+                                <field name="inbound_channel_limit"/>
+                                <field name="outbound_channel_limit"/>
+                                <field name="offnet_dids"/>
+                                <field name="international_sms"/>
+                                <field name="usf_exempt"/>
+                                <field name="white_labeling"/>
+                                <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
                             </group>
                             <group string="Qualification Questions" name="qualifications" col="4">
                                 <label for="monthly_usage" colspan="3"/>
@@ -95,6 +103,12 @@
                             </group>
                         </group>
                     </xpath>
+                    <xpath expr="//div[@class='o_address_format']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//label[@for='street']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
                     <xpath expr="//page[last()]" position="after">
                         <page string="teli Account Info">
                             <group>
@@ -102,6 +116,14 @@
                                 <field name="account_credit" readonly="1"/>
                                 <field name="uuid" readonly="1"/>
                                 <field name="invoice_term"/>
+                                <field name="inbound_channel_limit"/>
+                                <field name="outbound_channel_limit"/>
+                                <field name="offnet_dids"/>
+                                <field name="international_sms"/>
+                                <field name="usf_exempt"/>
+                                <field name="white_labeling"/>
+                                <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
                             </group>
                             <group string="Contacts">
                                 <field name="partner_ids" nolabel="1"/>
@@ -168,6 +190,14 @@
                         <group string="teli Account Info">
                             <field name="username" required="1"/>
                             <field name="account_credit"/>
+                            <field name="inbound_channel_limit"/>
+                            <field name="outbound_channel_limit"/>
+                            <field name="offnet_dids"/>
+                            <field name="international_sms"/>
+                            <field name="usf_exempt"/>
+                            <field name="white_labeling"/>
+                            <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                            <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
                         </group>
                         <group string="Qualification Questions" name="qualifications" col="4">
                             <label for="monthly_usage" colspan="3"/>

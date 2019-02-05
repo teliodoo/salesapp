@@ -8,11 +8,12 @@ _logger = logging.getLogger(__name__)
 # uncomment for debugging
 # _logger.setLevel('DEBUG')
 
+
 class teli_crm(models.Model):
     _inherit = 'crm.lead'
 
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
-                                    column1='lead_id', column2='partner_id', string='Contacts')
+                                   column1='lead_id', column2='partner_id', string='Contacts')
     teli_user_id = fields.Char('teli user id')
     teli_company_name = fields.Char('Company Name')
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
@@ -38,7 +39,7 @@ class teli_crm(models.Model):
         ], 'Who is personally overseeing the implementation?',
         help='Give an overview of the expectations of the next call and the ideal outcome.')
     current_messaging_platform = fields.Char('Current Messaging Platform?',
-        help='Is it compatible with XMPP, SMPP, or web services?')
+                                             help='Is it compatible with XMPP, SMPP, or web services?')
     interface_preference = fields.Selection([
             ('api', 'API'),
             ('portal', 'Portal')
@@ -57,8 +58,21 @@ class teli_crm(models.Model):
             ('15net15', '15 Net 15'),
             ('7net7', '7 Net 7'),
             ('7net3', '7 Net 3'),
-            ('generic', 'Generic')
+            ('generic', 'Generic'),
+            ('teli', 'teli Test Account')
         ], 'Invoice Terms', default='none')
+    offnet_dids = fields.Boolean('Enable Offnet DIDs?')
+    inbound_channel_limit = fields.Integer('Inbound Channel Limit')
+    outbound_channel_limit = fields.Integer('Outbound Channel Limit')
+    international_sms = fields.Boolean('Enable International SMS?')
+    usf_exempt = fields.Boolean('USF Exempt')
+    white_labeling = fields.Boolean('Reselling/White Labeling our Services')
+
+    invoices = fields.One2many(comodel_name='teli.invoice', inverse_name='crm_lead_id', string='Invoice Aggregate')
+    products = fields.Many2many('teli.products', 'teli_crm_products_rel', 'crm_lead_id', 'product_id',
+                                string="Product Areas of Inital Use")
+    gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
+                                string="Gateways Needed")
 
     def _format_name(self, name):
         """ _format_name - takes the entire name param and attempts to parse it
@@ -84,6 +98,11 @@ class teli_crm(models.Model):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
 
+        # Need to check if the lead was created by the daily cron Job
+        user_check = self._call_fetch_user()
+        if 'id' in user_check and user_check['id'] == self.teli_user_id and 'auth_token' in user_check and user_check['auth_token'] == self.uuid:
+            return False
+
         # attempt to create the account
         first_name, last_name = self._format_name(self.contact_name)
         params = {
@@ -102,10 +121,10 @@ class teli_crm(models.Model):
         # Check the response and set a note if the call was successful or not
         if create_response['code'] is not 200:
             self.message_post(content_subtype='plaintext', subject='teli API Warning',
-                body='[WARNING] Received the following error from teli: %s' % create_response['data'])
+                              body='[WARNING] Received the following error from teli: %s' % create_response['data'])
         else:
             self.message_post(content_subtype='plaintext', subject='teli API Note',
-                body='[SUCCESS] New account was successfully created.')
+                              body='[SUCCESS] New account was successfully created.')
 
             # if success, try to grab the uuid and update the oppr/acct
             user_response = teliapi.find_by_username({
@@ -143,9 +162,11 @@ class teli_crm(models.Model):
     @api.multi
     def handle_partner_assignation(self, action='create', partner_id=False):
         _logger.debug('hit handle_partner_assignation')
+        result = super().handle_partner_assignation(action, partner_id)
+        _logger.debug('the parent completed, and now we can create the user on teli')
         self._call_signup_user()
 
-        return super().handle_partner_assignation(action, partner_id)
+        return result
 
     @api.onchange('invoice_term')
     def _onchange_invoice_term(self):
@@ -175,7 +196,7 @@ class teli_crm(models.Model):
 
         if response['status'] is not 'success':
             self.message_post(subject='teli API Warning',
-                body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
+                              body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
 
     # --------------------------------------------------------------------------
     #   Constrains
@@ -186,7 +207,7 @@ class teli_crm(models.Model):
     def _lookup_teli_username(self):
         user_response = self._call_fetch_user()
 
-        if 'auth_token' in user_response:
+        if 'auth_token' in user_response and user_response['auth_token'] != self.uuid:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
 
     @api.multi
@@ -197,10 +218,27 @@ class teli_crm(models.Model):
         except ValueError:
             raise ValidationError('"What is the potential revenue?" must be a numeric value.')
 
-    # @api.multi
-    # @api.constrains('email_from')
-    # def _validate_new_email(self):
-    #     contact = self.env['res.partner'].search([('email', '=', self.email_from)])
-    #     _logger.debug(contact)
-    #     if contact:
-    #         raise ValidationError('That email already exists in the system.  Please "Create an Opportunity" instead of a lead.')
+
+class TeliProducts(models.Model):
+    """ Questions:
+        - Is there a better way to ensure no duplicate m2m options on reload than a sql constrains?
+        - How do I clean up the data in the database?
+        - how do/can I define alt string values for m2m options?
+    """
+    _name = 'teli.products'
+
+    name = fields.Char('Name', required=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', "Tag name already exists !"),
+    ]
+
+
+class Gateways(models.Model):
+    _name = 'teli.gateways'
+
+    name = fields.Char('Name', required=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', "Tag name already exists !"),
+    ]

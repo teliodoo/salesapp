@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 # uncomment for debugging
 # _logger.setLevel('DEBUG')
 
+
 class teli_lead2opportunity_partner(models.TransientModel):
     _inherit = 'crm.lead2opportunity.partner'
 
@@ -18,7 +19,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
     ], 'Related Contact', required=True)
     name = fields.Selection([('convert', 'Convert to opportunity')], default='convert')
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='wiz_teli_crm_partnerm2m',
-                                    column1='lead_id', column2='partner_id', string='Contacts')
+                                   column1='lead_id', column2='partner_id', string='Contacts')
     # credential fields
     username = fields.Char(string='teli Username', required=True)
     account_credit = fields.Char('Initial Account Credit')
@@ -41,8 +42,8 @@ class teli_lead2opportunity_partner(models.TransientModel):
             ('individual', 'Individual')
         ], 'Who is personally overseeing the implementation?', required=True,
         help='Give an overview of the expectations of the next call and the ideal outcome.')
-    current_messaging_platform = fields.Char('Current Messaging Platform?',
-        help='Is it compatible with XMPP, SMPP, or web services?', required=True)
+    current_messaging_platform = fields.Char('Current Messaging Platform?', required=True,
+                                             help='Is it compatible with XMPP, SMPP, or web services?')
     interface_preference = fields.Selection([
             ('api', 'API'),
             ('portal', 'Portal')
@@ -55,8 +56,15 @@ class teli_lead2opportunity_partner(models.TransientModel):
     def default_get(self, fields):
         """ Set the default values for teli username and initial account credit """
         result = super().default_get(fields)
+        if 'name' in result and result['name'] == 'merge':
+            result['name'] = 'convert'
+
         lead = self.env['crm.lead'].browse(self._context['active_id'])
 
+        if not lead.phone and not lead.mobile:
+            raise ValidationError("Fill in at least one of the following fields: 'Phone' or 'Mobile'")
+
+        result['action'] = 'create'
         result['username'] = lead.username if lead.username else ''
         result['account_credit'] = lead.account_credit if lead.account_credit else 25
         result['monthly_usage'] = lead.monthly_usage
@@ -162,13 +170,14 @@ class teli_lead2opportunity_partner(models.TransientModel):
     def _lookup_teli_username(self):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
+        current_lead = self.env['crm.lead'].browse(self._context['active_id'])
         _logger.debug('calling find_by_username for: %s' % self.username)
         user_response = teliapi.find_by_username({
             'token': current_user.teli_token,
             'username': self.username
         })
 
-        if 'auth_token' in user_response:
+        if 'auth_token' in user_response and user_response['auth_token'] != current_lead.uuid:
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
 
     @api.multi

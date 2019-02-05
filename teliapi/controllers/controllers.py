@@ -8,12 +8,12 @@ _logger = logging.getLogger(__name__)
 # uncomment for debugging
 # _logger.setLevel('DEBUG')
 
+
 class Teliapi(http.Controller):
     """ Teliapi - A controller for making requests to teli's API system.
     """
 
     _host = 'https://eadmin.teli.co'
-    _create_user_count = 0 # used to increment if username already exists
 
     @classmethod
     def _call(self, function, params={}, alt_host=None):
@@ -35,7 +35,7 @@ class Teliapi(http.Controller):
 
             if response.status_code != 200 or content['code'] != 200:
                 _logger.error("[%s] Received non-200 status code" %
-                    (response.status_code if response.status_code != 200 else content['code']))
+                              (response.status_code if response.status_code != 200 else content['code']))
                 return content
         except ValueError:
             # according to the requests webpage, a ValueError can occur when
@@ -57,7 +57,7 @@ class Teliapi(http.Controller):
 
         request_params = {
             'username': params['username'] if 'username' in params else
-                ("%s-%s" % (params['first_name'], params['last_name'])), # TODO what shall the username be?
+            ("%s-%s" % (params['first_name'], params['last_name'])),
             'email': params['email'],
             'first_name': params['first_name'],
             'last_name': params['last_name'],
@@ -90,7 +90,7 @@ class Teliapi(http.Controller):
             # FIXME this is untested, and shouldn't be necessary because the associate can set the username in the CRM.
             # username error
             self._create_user_count += 1
-            response = self.create_customer(params, ''.join([request_params['username'], str(self._create_user_count)])) # TODO need to do something else and rerun
+            response = self.create_customer(params, ''.join([request_params['username'], str(self._create_user_count)]))
 
         # bubble up 200s and 500s to the model
         return response
