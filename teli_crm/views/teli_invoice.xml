@@ -12,142 +12,143 @@
                             <field name="invoices">
                                 <tree>
                                     <field name="create_dt"/>
-                                    <field name="total_amount"/>
+                                    <field name="modify_dt"/>
+                                    <field name="total_price"/>
                                     <field name="total_credits"/>
                                 </tree>
                                 <form>
                                     <group col="4" string="Numbering">
                                         <label for="local_numbers"/>
                                         <field name="local_numbers" nolabel="1"/>
+                                        <field name="local_numbers_rate" nolabel="1"/>
                                         <field name="local_numbers_price" nolabel="1"/>
-                                        <field name="local_numbers_amount" nolabel="1"/>
 
                                         <label for="tollfree_numbers"/>
                                         <field name="tollfree_numbers" nolabel="1"/>
+                                        <field name="tollfree_numbers_rate" nolabel="1"/>
                                         <field name="tollfree_numbers_price" nolabel="1"/>
-                                        <field name="tollfree_numbers_amount" nolabel="1"/>
 
                                         <label for="international_numbers"/>
                                         <field name="international_numbers" nolabel="1"/>
+                                        <field name="international_numbers_rate" nolabel="1"/>
                                         <field name="international_numbers_price" nolabel="1"/>
-                                        <field name="international_numbers_amount" nolabel="1"/>
 
                                         <label for="offnet_numbers"/>
                                         <field name="offnet_numbers" nolabel="1"/>
+                                        <field name="offnet_numbers_rate" nolabel="1"/>
                                         <field name="offnet_numbers_price" nolabel="1"/>
-                                        <field name="offnet_numbers_amount" nolabel="1"/>
 
                                         <label for="e911"/>
                                         <field name="e911" nolabel="1"/>
+                                        <field name="e911_rate" nolabel="1"/>
                                         <field name="e911_price" nolabel="1"/>
-                                        <field name="e911_amount" nolabel="1"/>
 
                                         <label for="lnp_requests"/>
                                         <field name="lnp_requests" nolabel="1"/>
+                                        <field name="lnp_requests_rate" nolabel="1"/>
                                         <field name="lnp_requests_price" nolabel="1"/>
-                                        <field name="lnp_requests_amount" nolabel="1"/>
 
                                     </group>
                                     <group col="4" string="Voice">
                                         <label for="minutes_inbound"/>
                                         <field name="minutes_inbound" nolabel="1"/>
+                                        <field name="minutes_inbound_rate" nolabel="1"/>
                                         <field name="minutes_inbound_price" nolabel="1"/>
-                                        <field name="minutes_inbound_amount" nolabel="1"/>
 
                                         <label for="minutes_outbound"/>
                                         <field name="minutes_outbound" nolabel="1"/>
+                                        <field name="minutes_outbound_rate" nolabel="1"/>
                                         <field name="minutes_outbound_price" nolabel="1"/>
-                                        <field name="minutes_outbound_amount" nolabel="1"/>
 
                                         <label for="channel_groups_qty"/>
                                         <field name="channel_groups_qty" nolabel="1"/>
+                                        <field name="channel_groups_rate" nolabel="1"/>
                                         <field name="channel_groups_price" nolabel="1"/>
-                                        <field name="channel_groups_amount" nolabel="1"/>
 
                                         <label for="local_sms_in"/>
                                         <field name="local_sms_in" nolabel="1"/>
+                                        <field name="local_sms_in_rate" nolabel="1"/>
                                         <field name="local_sms_in_price" nolabel="1"/>
-                                        <field name="local_sms_in_amount" nolabel="1"/>
 
                                         <label for="local_sms_out"/>
                                         <field name="local_sms_out" nolabel="1"/>
+                                        <field name="local_sms_out_rate" nolabel="1"/>
                                         <field name="local_sms_out_price" nolabel="1"/>
-                                        <field name="local_sms_out_amount" nolabel="1"/>
 
                                         <label for="local_mms_in"/>
                                         <field name="local_mms_in" nolabel="1"/>
+                                        <field name="local_mms_in_rate" nolabel="1"/>
                                         <field name="local_mms_in_price" nolabel="1"/>
-                                        <field name="local_mms_in_amount" nolabel="1"/>
 
                                         <label for="local_mms_out"/>
                                         <field name="local_mms_out" nolabel="1"/>
+                                        <field name="local_mms_out_rate" nolabel="1"/>
                                         <field name="local_mms_out_price" nolabel="1"/>
-                                        <field name="local_mms_out_amount" nolabel="1"/>
 
                                         <label for="tf_sms_in"/>
                                         <field name="tf_sms_in" nolabel="1"/>
+                                        <field name="tf_sms_in_rate" nolabel="1"/>
                                         <field name="tf_sms_in_price" nolabel="1"/>
-                                        <field name="tf_sms_in_amount" nolabel="1"/>
 
                                         <label for="tf_sms_out"/>
                                         <field name="tf_sms_out" nolabel="1"/>
+                                        <field name="tf_sms_out_rate" nolabel="1"/>
                                         <field name="tf_sms_out_price" nolabel="1"/>
-                                        <field name="tf_sms_out_amount" nolabel="1"/>
 
                                         <label for="tf_mms_in"/>
                                         <field name="tf_mms_in" nolabel="1"/>
+                                        <field name="tf_mms_in_rate" nolabel="1"/>
                                         <field name="tf_mms_in_price" nolabel="1"/>
-                                        <field name="tf_mms_in_amount" nolabel="1"/>
 
                                         <label for="tf_mms_out"/>
                                         <field name="tf_mms_out" nolabel="1"/>
+                                        <field name="tf_mms_out_rate" nolabel="1"/>
                                         <field name="tf_mms_out_price" nolabel="1"/>
-                                        <field name="tf_mms_out_amount" nolabel="1"/>
 
                                         <label for="intl_sms_in"/>
                                         <field name="intl_sms_in" nolabel="1"/>
+                                        <field name="intl_sms_in_rate" nolabel="1"/>
                                         <field name="intl_sms_in_price" nolabel="1"/>
-                                        <field name="intl_sms_in_amount" nolabel="1"/>
 
                                         <label for="intl_sms_out"/>
                                         <field name="intl_sms_out" nolabel="1"/>
+                                        <field name="intl_sms_out_rate" nolabel="1"/>
                                         <field name="intl_sms_out_price" nolabel="1"/>
-                                        <field name="intl_sms_out_amount" nolabel="1"/>
 
                                         <label for="intl_mms_in"/>
                                         <field name="intl_mms_in" nolabel="1"/>
+                                        <field name="intl_mms_in_rate" nolabel="1"/>
                                         <field name="intl_mms_in_price" nolabel="1"/>
-                                        <field name="intl_mms_in_amount" nolabel="1"/>
 
                                         <label for="intl_mms_out"/>
                                         <field name="intl_mms_out" nolabel="1"/>
+                                        <field name="intl_mms_out_rate" nolabel="1"/>
                                         <field name="intl_mms_out_price" nolabel="1"/>
-                                        <field name="intl_mms_out_amount" nolabel="1"/>
 
                                         <label for="sc_sms_in"/>
                                         <field name="sc_sms_in" nolabel="1"/>
+                                        <field name="sc_sms_in_rate" nolabel="1"/>
                                         <field name="sc_sms_in_price" nolabel="1"/>
-                                        <field name="sc_sms_in_amount" nolabel="1"/>
 
                                         <label for="sc_sms_out"/>
                                         <field name="sc_sms_out" nolabel="1"/>
+                                        <field name="sc_sms_out_rate" nolabel="1"/>
                                         <field name="sc_sms_out_price" nolabel="1"/>
-                                        <field name="sc_sms_out_amount" nolabel="1"/>
 
                                         <label for="sc_mms_in"/>
                                         <field name="sc_mms_in" nolabel="1"/>
+                                        <field name="sc_mms_in_rate" nolabel="1"/>
                                         <field name="sc_mms_in_price" nolabel="1"/>
-                                        <field name="sc_mms_in_amount" nolabel="1"/>
 
                                         <label for="sc_mms_out"/>
                                         <field name="sc_mms_out" nolabel="1"/>
+                                        <field name="sc_mms_out_rate" nolabel="1"/>
                                         <field name="sc_mms_out_price" nolabel="1"/>
-                                        <field name="sc_mms_out_amount" nolabel="1"/>
 <!--
                                         <label for=""/>
                                         <field name="" nolabel="1"/>
+                                        <field name="_rate" nolabel="1"/>
                                         <field name="_price" nolabel="1"/>
-                                        <field name="_amount" nolabel="1"/>
 
  -->
                                     </group>
@@ -162,7 +163,7 @@
                                     </group>
                                     <group string="Summary">
                                         <field name="create_dt"/>
-                                        <field name="total_amount"/>
+                                        <field name="total_price"/>
                                         <field name="total_credits"/>
                                     </group>
                                 </form>
