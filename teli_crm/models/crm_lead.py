@@ -14,11 +14,26 @@ class teli_crm(models.Model):
 
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
                                    column1='lead_id', column2='partner_id', string='Contacts')
+    teli_lead_status = fields.Selection([
+        ('open', 'Open'),
+        ('qualifying', 'Qualifying'),
+        ('recycled', 'Recycled'),
+        ('unqualified', 'Unqualified'),
+        ('dead', 'Dead')
+    ], 'Lead Status')
     teli_user_id = fields.Char('teli user id')
     teli_company_name = fields.Char('Company Name')
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
+    account_status = fields.Selection([
+        ('active', 'Active'),
+        ('inactive-disabled', 'Disabled'),
+        ('inactive-no-funds-soft', 'No Funds - Soft Inactive'),
+        ('inactive-no-funds-hard', 'No Funds - Hard Inactive'),
+        ('inactive-fraud', 'Inactive Fraud'),
+        ('pending-approval', 'Pending Approval')
+    ], 'Account Status')
 
     # qualification questions
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?')
