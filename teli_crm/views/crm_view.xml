@@ -1,5 +1,10 @@
 <odoo>
     <data>
+        <template id="assets_backend" name="teli_crm_lead_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/teli_crm/static/src/css/teli_crm_lead.css"/>
+            </xpath>
+        </template>
         <!-- explicit list view definition -->
         <record id="teli_crm.crm_case_form_view_leads_inhrtied" model="ir.ui.view">
             <field name="name">teli_crm.list</field>
@@ -25,8 +30,8 @@
                                 <field name="international_sms"/>
                                 <field name="usf_exempt"/>
                                 <field name="white_labeling"/>
-                                <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
-                                <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="products" class="oe_checkboxes_horizontal" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="gateways" class="oe_checkboxes_horizontal" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
                             </group>
                             <group string="Qualification Questions" name="qualifications" col="4">
                                 <label for="monthly_usage" colspan="3"/>
@@ -123,8 +128,8 @@
                                 <field name="international_sms"/>
                                 <field name="usf_exempt"/>
                                 <field name="white_labeling"/>
-                                <field name="products" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
-                                <field name="gateways" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="products" class="oe_checkboxes_horizontal" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
+                                <field name="gateways" class="oe_checkboxes_horizontal" widget="many2many_checkboxes" options="{'no_create_edit': '1'}"/>
                             </group>
                             <group string="Contacts">
                                 <field name="partner_ids" nolabel="1"/>

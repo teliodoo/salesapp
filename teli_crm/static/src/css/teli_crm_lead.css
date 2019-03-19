@@ -1,0 +1,5 @@
+
+.oe_checkboxes_horizontal > div {
+    float: left;
+    width: 200px;
+}
