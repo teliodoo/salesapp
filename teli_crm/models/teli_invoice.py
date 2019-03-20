@@ -11,6 +11,8 @@ _logger = logging.getLogger(__name__)
 class TeliInvoice(models.Model):
     _name = 'teli.invoice'
 
+    _order = "create_dt DESC"
+
     def _calculate_rate(self, x, y):
         """
             _calculate_rate - simple method to calculate the per unit rate while
