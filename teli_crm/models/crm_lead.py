@@ -233,7 +233,7 @@ class teli_crm(models.Model):
         try:
             temp = int(self.potential)
         except ValueError:
-            raise ValidationError('"What is the potential revenue?" must be a numeric value.')
+            raise ValidationError('"What is the potential revenue per month?" must be a numeric value.')
 
 
 class TeliProducts(models.Model):

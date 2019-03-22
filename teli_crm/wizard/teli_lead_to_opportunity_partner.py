@@ -27,7 +27,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
     # qualification questions
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?', required=True)
     number_of_dids = fields.Char(string='How many DIDs are in service?', required=True)
-    potential = fields.Char(string='What is the potential revenue?', required=True)
+    potential = fields.Char(string='What is the potential revenue per month?', required=True)
     current_service = fields.Char(string='What type of services are they currently using today in their company?', required=True)
     under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?', required=True)
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
@@ -97,7 +97,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 <dd>'{usage}'</dd>
                 <dt>How many DIDs are in service?</dt>
                 <dd>'{num_dids}'</dd>
-                <dt>What is the potential revenue?</dt>
+                <dt>What is the potential revenue per month?</dt>
                 <dd>'{potential}'</dd>
                 <dt>What type of services are they currently using today?</dt>
                 <dd>'{services}'</dd>
