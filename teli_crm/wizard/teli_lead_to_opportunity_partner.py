@@ -170,20 +170,23 @@ class teli_lead2opportunity_partner(models.TransientModel):
     def _lookup_teli_username(self):
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
-        current_lead = self.env['crm.lead'].browse(self._context['active_id'])
         _logger.debug('calling find_by_username for: %s' % self.username)
         user_response = teliapi.find_by_username({
             'token': current_user.teli_token,
             'username': self.username
         })
 
-        if 'auth_token' in user_response and user_response['auth_token'] != current_lead.uuid:
+        # Check to see if we get a "User not found" response from the teli API
+        # elif checks to see if the username requested returns a valid user object
+        if 'code' in user_response and user_response['code'] != 200 and user_response['data'] != 'User not found':
+            raise ValidationError("An error occurred: %s" % user_response['data'])
+        elif all(k in user_response for k in ("id", "username", "email", "auth_token")):
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
 
     @api.multi
     @api.constrains('potential')
     def _valid_potential_value(self):
         try:
-            temp = int(self.potential)
+            int(self.potential)
         except ValueError:
             raise ValidationError('Found non-numeric data in the "What is the potential" answer.')

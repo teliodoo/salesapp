@@ -34,11 +34,13 @@ class teli_crm(models.Model):
         ('inactive-fraud', 'Inactive Fraud'),
         ('pending-approval', 'Pending Approval')
     ], 'Account Status')
+    # teli_revenue = fields.Char('Revenue')
+    # teli_usage = fields.Char('Usage')
 
     # qualification questions
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?')
     number_of_dids = fields.Char(string='How many DIDs are in service?')
-    potential = fields.Char(string='What is the potential revenue?')
+    potential = fields.Char(string='What is the potential revenue per month?')
     current_service = fields.Char(string='What type of services are they currently using today in their company?')
     under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?')
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')

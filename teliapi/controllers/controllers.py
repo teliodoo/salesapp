@@ -108,11 +108,11 @@ class Teliapi(http.Controller):
         # check the response for no data returned
         if response['code'] is not 200:
             _logger.warning('[ERROR][%s] received an error: %s' % (response['code'], response['data']))
-            return {}
+            return response
 
         if len(response['data']) is 0:
             _logger.warning('No results found')
-            return {}
+            return response
 
         # search the data for the recently created user account
         for user in response['data']:
@@ -122,7 +122,7 @@ class Teliapi(http.Controller):
                 return user
 
         _logger.warning('Couldn\'t find the correct user...')
-        return {}
+        return response
 
     @classmethod
     def set_invoice_term(self, params):

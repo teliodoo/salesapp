@@ -14,6 +14,7 @@
                 <data>
                     <xpath expr="//field[@name='partner_name']" position="replace">
                         <field name="teli_company_name"/>
+                        <field name="teli_lead_status"/>
                     </xpath>
                     <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="replace">
                         <button name="%(crm.action_crm_lead2opportunity_partner)d" string="Convert to Account" type="action"
