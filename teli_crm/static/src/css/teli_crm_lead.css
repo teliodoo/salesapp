@@ -1,5 +1,5 @@
 
-.oe_checkboxes_horizontal > div {
+.teli_horizontal_cb > div {
     float: left;
     width: 200px;
 }
@@ -15,15 +15,13 @@
 .o_thread_message_content > dl > dt {
     float: left;
     width: 60%;
-    padding: 0px;
-    margin-bottom: 1.25em;
+    padding: 1em 0em;
     border-top: 1px solid black;
 }
 
 .o_thread_message_content > dl > dd {
     float: left;
     width: 40%;
-    padding: 0px;
-    margin-bottom: 1.25em;
+    padding: 1em 0px;
     border-top: 1px solid black;
 }
