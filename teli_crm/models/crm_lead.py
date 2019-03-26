@@ -170,7 +170,7 @@ class teli_crm(models.Model):
             'token': current_user.teli_token
         })
 
-        if response['status'] is not 'success':
+        if response['code'] is not 200:
             self.message_post(subject='teli API Warning',
                               body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
 
