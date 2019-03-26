@@ -70,7 +70,7 @@ class Teliapi(http.Controller):
             _logger.debug("%s => %s" % (key, value))
 
         # optional param, but will probably be needed/supplied by sales
-        if params['company_name']:
+        if 'company_name' in params:
             request_params['company_name'] = params['company_name']
 
         if new_username:

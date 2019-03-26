@@ -28,8 +28,10 @@ class teli_lead2opportunity_partner(models.TransientModel):
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?', required=True)
     number_of_dids = fields.Char(string='How many DIDs are in service?', required=True)
     potential = fields.Char(string='What is the potential revenue per month?', required=True)
-    current_service = fields.Char(string='What type of services are they currently using today in their company?', required=True)
-    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?', required=True)
+    current_service = fields.Char(string='What type of services are they currently using today in their company?',
+                                  required=True)
+    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?',
+                                 help='Under Contract?', required=True)
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
     buying_motivation = fields.Selection([
@@ -140,10 +142,22 @@ class teli_lead2opportunity_partner(models.TransientModel):
 
         lead = self.env['crm.lead'].browse(self._context['active_id'])
 
+        # validate that the lead email doesn't already exist in res.partner
+        partner = self.env['res.partner'].search_count([('email', '=', lead.email_from)])
+        if self.action == 'create' and partner > 0:
+            raise ValidationError('The Email already exists.  Can\'t create as a new contact.')
+
         # the "potential" constrains has ensured that the value is a number
         lead.planned_revenue = int(self.potential)
 
+        # set the username before calling signup_user because the lead username constrains needs to be executed first
         lead.username = self.username
+
+        # once the lead username constrains checks out, then we can call signup user
+        if not self._call_signup_user():
+            raise ValidationError('An error occurred while attempting to create the user acccount')
+
+        # copy the qualification questions back to the lead (the values could have been updated)
         lead.account_credit = self.account_credit
         lead.monthly_usage = self.monthly_usage
         lead.number_of_dids = self.number_of_dids
@@ -165,6 +179,54 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.partner_ids = self.partner_ids
         return super().action_apply()
 
+    def _call_signup_user(self):
+        # make call get data
+        teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
+        lead = self.env['crm.lead'].browse(self._context['active_id'])
+
+        # attempt to create the account
+        create_response = teliapi.create_user(
+            current_user.teli_token,
+            lead.contact_name,
+            lead.email_from,
+            lead.mobile if lead.mobile else lead.phone,
+            self.username,
+            self.account_credit,
+            lead.teli_company_name
+        )
+
+        # Check the response and set a note if the call was successful or not
+        if create_response['code'] is not 200:
+            lead.message_post(content_subtype='plaintext', subject='teli API Warning',
+                              body='[WARNING] Received the following error from teli: %s' % create_response['data'])
+            return False
+
+        lead.message_post(content_subtype='plaintext', subject='teli API Note',
+                          body='[SUCCESS] New account was successfully created.')
+
+        # if success, try to grab the uuid and update the oppr/acct
+        user_response = teliapi.find_by_username({
+            'token': current_user.teli_token,
+            'username': self.username
+        })
+        lead.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
+        lead.teli_user_id = user_response['id'] if 'id' in user_response else ''
+        return True
+
+    @api.multi
+    @api.onchange('action')
+    def _find_existing_contact(self):
+        if self.action == 'exist':
+            lead = self.env['crm.lead'].browse(self._context['active_id'])
+            partner = self.env['res.partner'].search([('email', '=', lead.email_from)])
+            self.partner_ids = partner
+        else:
+            self.partner_ids = []
+
+    # --------------------------------------------------------------------------
+    #   Constrains
+    # --------------------------------------------------------------------------
     @api.multi
     @api.constrains('username')
     def _lookup_teli_username(self):
