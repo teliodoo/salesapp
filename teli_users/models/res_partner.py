@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, api
+from odoo import models, api, fields
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -15,6 +15,9 @@ class TeliResPartner(models.Model):
     _sql_constraints = [
         ('email_partner_user_uniq', 'unique(email)', 'Contact email must be unique!'),
     ]
+
+    property_account_payable_id = fields.Many2one('account.account', required=False)
+    property_account_receivable_id = fields.Many2one('account.account', required=False)
 
     @api.multi
     def _compute_opportunity_count(self):
