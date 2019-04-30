@@ -34,6 +34,7 @@ class teli_crm(models.Model):
         ('inactive-fraud', 'Inactive Fraud'),
         ('pending-approval', 'Pending Approval')
     ], 'Account Status')
+    skip_constrains_test = True
     # teli_revenue = fields.Char('Revenue')
     # teli_usage = fields.Char('Usage')
 
@@ -87,6 +88,8 @@ class teli_crm(models.Model):
     white_labeling = fields.Boolean('Reselling/White Labeling our Services')
 
     invoices = fields.One2many(comodel_name='teli.invoice', inverse_name='crm_lead_id', string='Invoice Aggregate')
+    # invoice_agg = fields.One2many(comodel_name='teli.invoice.aggregate', inverse_name='crm_lead_id',
+    #                               string="Invoice Aggregate")
     products = fields.Many2many('teli.products', 'teli_crm_products_rel', 'crm_lead_id', 'product_id',
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
@@ -137,20 +140,28 @@ class teli_crm(models.Model):
     @api.multi
     def close_dialog(self):
         _logger.debug('hit close_dialog')
+        self.skip_constrains_test = False
+
         if not self._call_signup_user():
             raise ValidationError("An error occurred while attempting to create the account.")
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
 
-        return super().close_dialog()
+        result = super().close_dialog()
+        self.skip_constrains_test = True
+        return result
 
     @api.multi
     def edit_dialog(self):
         _logger.debug('hit edit_dialog')
+        self.skip_constrains_test = False
+
         if not self._call_signup_user():
             raise ValidationError("An error occurred while attempting to create the account.")
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
 
-        return super().edit_dialog()
+        result = super().edit_dialog()
+        self.skip_constrains_test = True
+        return result
 
     # --------------------------------------------------------------------------
     #   Constrains
@@ -177,6 +188,10 @@ class teli_crm(models.Model):
     @api.multi
     @api.constrains('username')
     def _lookup_teli_username(self):
+        if self.skip_constrains_test:
+            _logger.warn('Skipping username constraint test')
+            return True
+
         user_response = self._call_fetch_user()
 
         # Check to see if we get a "User not found" response from the teli API
