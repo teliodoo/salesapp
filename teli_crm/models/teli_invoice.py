@@ -26,6 +26,7 @@ class TeliInvoice(models.Model):
     crm_lead_id = fields.Many2one('crm.lead', string='Account', index=True)
 
     # Channel Groups ----------------------------------------------------------------------
+    channel_groups_qty = fields.Integer('Channel Groups Quantity', default=0, invisible=1)
     channel_groups = fields.Integer('Channel Groups Quantity', default=0)
     channel_groups_price = fields.Float('Channel Groups Price', digits=(13, 2), default=0.0)
     channel_groups_rate = fields.Float('Channel Groups Rate', digits=(13, 6), compute='_compute_cg_rate')
