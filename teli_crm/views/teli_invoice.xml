@@ -209,7 +209,7 @@
  -->
                                     </group>
                                     <field name="display_adt" invisible="1"/>
-                                    <group string="Other Charges" attrs="{'invisible':[('display_adt', '=', True)]}">
+                                    <group string="Other Charges" attrs="{'invisible':[('display_adt', '=', 1)]}">
                                         <field name="admin_debit_tids" nolabel="1"/>
                                     </group>
                                     <group string="Credits">
