@@ -436,11 +436,11 @@ class TeliInvoice(models.Model):
     @api.one
     @api.depends('admin_debit_tids')
     def _compute_display_adt(self):
-        if self.admin_debit_tids is "SKIPME":
-            # i.e. found SKIPME in element, hence don't display
-            self.display_adt = 0
+        _logger.debug("value of admin_debit_tids is: " + self.admin_debit_tids)
+        if "SKIPME" in self.admin_debit_tids:
+            self.display_adt = False
         else:
-            self.display_adt = 1
+            self.display_adt = True
 
     total_price = fields.Float('Total Amount:', compute='_compute_total_price')
     total_credits = fields.Float('Total Credits', compute='_compute_total_credits')
