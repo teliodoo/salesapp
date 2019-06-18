@@ -25,8 +25,10 @@ class TeliInvoice(models.Model):
 
     crm_lead_id = fields.Many2one('crm.lead', string='Account', index=True)
 
-    # Channel Groups ----------------------------------------------------------------------
+    # Not used anymore but can't remove it because Odoo can't deal with changes...
     channel_groups_qty = fields.Integer('Channel Groups Quantity', default=0, invisible=1)
+
+    # Channel Groups ----------------------------------------------------------------------
     channel_groups = fields.Integer('Channel Groups Quantity', default=0)
     channel_groups_price = fields.Float('Channel Groups Price', digits=(13, 2), default=0.0)
     channel_groups_rate = fields.Float('Channel Groups Rate', digits=(13, 6), compute='_compute_cg_rate')
@@ -428,7 +430,7 @@ class TeliInvoice(models.Model):
     credit_paypal = fields.Float('Credit Paypal')
     credit_bitcoin = fields.Float('Credit Bitcoin')
     display_adt = fields.Boolean('Display Admin Debits TransactionIds?', default=False, compute='_compute_display_adt')
-    adjustment_total = fields.Float('Transaction Totals', digits=(13, 6), default=0.0, readonly=True)
+    adjustment_total = fields.Float('Transaction Totals', digits=(13, 2), default=0.0, readonly=True)
     admin_debit_tids = fields.Html('Other Charges', readonly=True, default="SKIPME")
 
     @api.one

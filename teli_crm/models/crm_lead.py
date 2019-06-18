@@ -87,7 +87,7 @@ class teli_crm(models.Model):
     usf_exempt = fields.Boolean('USF Exempt')
     white_labeling = fields.Boolean('Reselling/White Labeling our Services')
 
-    invoices = fields.One2many(comodel_name='teli.invoice', inverse_name='crm_lead_id', string='Invoice Aggregate')
+    invoices = fields.One2many(comodel_name='teli.invoice', inverse_name='crm_lead_id', string='Invoice Aggregate', limit=10)
     products = fields.Many2many('teli.products', 'teli_crm_products_rel', 'crm_lead_id', 'product_id',
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
