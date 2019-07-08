@@ -105,3 +105,11 @@ class teliapi(models.Model):
         get_user_response = Teliapi.get_user()
 
         return get_user_response
+
+    @api.multi
+    def enable_offnet_dids(self, params):
+        """ enable_offnet_dids - tries to turn on offnet dids for a given teli_user_id
+            params:
+             - user_id: the teli user_id
+        """
+        return Teliapi.enable_offnet_dids(params)

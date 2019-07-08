@@ -395,10 +395,10 @@ class TeliInvoice(models.Model):
     # billing_dids_nrc
     # billing_dids_porting
     # billing_dids_vanity
-    # billing-services-hosting
-    # billing-services-other
-    # billing-dids-total-monthly
-    # billing-services-total-monthly
+    # billing_services_hosting
+    # billing_services_other
+    # billing_dids_total_monthly
+    # billing_services_total_monthly
 
     # ------------------------------------------------------------------------- [billing_cnam_query]
     billing_cnam_query = fields.Integer('Billing CNAM Query', default=0)

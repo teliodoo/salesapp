@@ -141,6 +141,14 @@ class Teliapi(http.Controller):
         """
         return self._call('/user/get', alt_host='https://apiv1.teleapi.net')['data']
 
+    @classmethod
+    def enable_offnet_dids(self, params):
+        """ enable_offnet_dids - attempts to enable offnet dids
+        """
+        return self._call('/user/offnet/enable', {
+            'user_id': params['user_id']
+        })
+
     @http.route('/teliapi/user/get', type='http', auth='user')
     def get_user_direct(self):
         """ get_user_direct - external testing endpoint for get_user

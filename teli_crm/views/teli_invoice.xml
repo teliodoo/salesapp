@@ -9,6 +9,9 @@
                 <data>
                     <xpath expr="//notebook" position="inside">
                         <page string="Invoice Data">
+                            <group>
+                                <field name="month_to_date"/>
+                            </group>
                             <field name="invoices">
                                 <tree>
                                     <field name="create_dt"/>

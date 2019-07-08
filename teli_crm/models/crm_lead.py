@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import logging
+import datetime
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
@@ -33,7 +34,7 @@ class teli_crm(models.Model):
         ('inactive-no-funds-hard', 'No Funds - Hard Inactive'),
         ('inactive-fraud', 'Inactive Fraud'),
         ('pending-approval', 'Pending Approval')
-    ], 'Account Status')
+    ], 'Teli User Status')
     skip_constrains_test = True
     # teli_revenue = fields.Char('Revenue')
     # teli_usage = fields.Char('Usage')
@@ -92,6 +93,7 @@ class teli_crm(models.Model):
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
                                 string="Gateways Needed")
+    month_to_date = fields.Float('Month to Date Total', digits=(13, 2), compute="_calc_month_to_date")
 
     def _call_signup_user(self):
         # make call get data
@@ -162,6 +164,23 @@ class teli_crm(models.Model):
         return result
 
     # --------------------------------------------------------------------------
+    #   Computed
+    # --------------------------------------------------------------------------
+    @api.depends()
+    def _calc_month_to_date(self):
+        last_month = datetime.date.today() - datetime.timedelta(days=30)
+        last_month = last_month.__str__()
+        ia = self.env['teli.invoice'].search([
+            ('crm_lead_id', '=', self.id),
+            ('create_dt', '>', last_month)
+        ])
+
+        _logger.debug('count of teli.invoice: %s' % len(ia))
+        for agg in ia:
+            _logger.debug(' * %s' % agg.total_price)
+            self.month_to_date += agg.total_price
+
+    # --------------------------------------------------------------------------
     #   Constrains
     # --------------------------------------------------------------------------
     @api.multi
@@ -203,9 +222,21 @@ class teli_crm(models.Model):
     @api.constrains('potential')
     def _valid_potential_value(self):
         try:
-            int(self.potential)
+            if self.potential[0] == '$':
+                float(self.potential[1:])
+            else:
+                float(self.potential)
         except ValueError:
             raise ValidationError('"What is the potential revenue per month?" must be a numeric value.')
+
+    @api.multi
+    @api.constrains('offnet_dids')
+    def _enable_offnet_dids(self):
+        teliapi = self.env['teliapi.teliapi']
+        result = teliapi.enable_offnet_dids({'user_id': self.teli_user_id})
+
+        if result['code'] is not 200:
+            self.message_post(subject='teli API Warning', body='<h2>[WARNING]</h2><p>%s</p>' % result['data'])
 
 
 class TeliProducts(models.Model):
