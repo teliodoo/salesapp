@@ -9,6 +9,9 @@
                 <data>
                     <xpath expr="//notebook" position="inside">
                         <page string="Invoice Data">
+                            <group>
+                                <field name="month_to_date"/>
+                            </group>
                             <field name="invoices">
                                 <tree>
                                     <field name="create_dt"/>
@@ -43,10 +46,20 @@
                                         <field name="e911_rate" nolabel="1"/>
                                         <field name="e911_price" nolabel="1"/>
 
-                                        <label for="lnp_requests"/>
-                                        <field name="lnp_requests" nolabel="1"/>
-                                        <field name="lnp_requests_rate" nolabel="1"/>
-                                        <field name="lnp_requests_price" nolabel="1"/>
+                                        <label for="lnp_requests" attrs="{'invisible':[('lnp_requests', '=', 0)]}"/>
+                                        <field name="lnp_requests" nolabel="1" attrs="{'invisible':[('lnp_requests', '=', 0)]}"/>
+                                        <field name="lnp_requests_rate" nolabel="1" attrs="{'invisible':[('lnp_requests', '=', 0)]}"/>
+                                        <field name="lnp_requests_price" nolabel="1" attrs="{'invisible':[('lnp_requests', '=', 0)]}"/>
+
+                                        <label for="billing_cnam_query"/>
+                                        <field name="billing_cnam_query" nolabel="1"/>
+                                        <field name="billing_cnam_query_rate" nolabel="1"/>
+                                        <field name="billing_cnam_query_price" nolabel="1"/>
+
+                                        <label for="billing_lrn_query"/>
+                                        <field name="billing_lrn_query" nolabel="1"/>
+                                        <field name="billing_lrn_query_rate" nolabel="1"/>
+                                        <field name="billing_lrn_query_price" nolabel="1"/>
 
                                     </group>
                                     <group col="4" string="Voice">
@@ -60,10 +73,45 @@
                                         <field name="minutes_outbound_rate" nolabel="1"/>
                                         <field name="minutes_outbound_price" nolabel="1"/>
 
-                                        <label for="channel_groups_qty"/>
-                                        <field name="channel_groups_qty" nolabel="1"/>
+                                        <label for="channel_groups"/>
+                                        <field name="channel_groups" nolabel="1"/>
                                         <field name="channel_groups_rate" nolabel="1"/>
                                         <field name="channel_groups_price" nolabel="1"/>
+
+                                        <label for="voice_did_local_in"/>
+                                        <field name="voice_did_local_in" nolabel="1"/>
+                                        <field name="voice_did_local_in_rate" nolabel="1"/>
+                                        <field name="voice_did_local_in_price" nolabel="1"/>
+
+                                        <label for="voice_term_usa_out"/>
+                                        <field name="voice_term_usa_out" nolabel="1"/>
+                                        <field name="voice_term_usa_out_rate" nolabel="1"/>
+                                        <field name="voice_term_usa_out_price" nolabel="1"/>
+
+                                        <label for="voice_did_tf_in"/>
+                                        <field name="voice_did_tf_in" nolabel="1"/>
+                                        <field name="voice_did_tf_in_rate" nolabel="1"/>
+                                        <field name="voice_did_tf_in_price" nolabel="1"/>
+
+                                        <label for="voice_term_tf_out"/>
+                                        <field name="voice_term_tf_out" nolabel="1"/>
+                                        <field name="voice_term_tf_out_rate" nolabel="1"/>
+                                        <field name="voice_term_tf_out_price" nolabel="1"/>
+
+                                        <label for="voice_did_intl_in"/>
+                                        <field name="voice_did_intl_in" nolabel="1"/>
+                                        <field name="voice_did_intl_in_rate" nolabel="1"/>
+                                        <field name="voice_did_intl_in_price" nolabel="1"/>
+
+                                        <label for="voice_term_intl_out"/>
+                                        <field name="voice_term_intl_out" nolabel="1"/>
+                                        <field name="voice_term_intl_out_rate" nolabel="1"/>
+                                        <field name="voice_term_intl_out_price" nolabel="1"/>
+
+                                        <label for="voice_term_fax_out"/>
+                                        <field name="voice_term_fax_out" nolabel="1"/>
+                                        <field name="voice_term_fax_out_rate" nolabel="1"/>
+                                        <field name="voice_term_fax_out_price" nolabel="1"/>
 
                                         <label for="local_sms_in"/>
                                         <field name="local_sms_in" nolabel="1"/>
@@ -144,6 +192,17 @@
                                         <field name="sc_mms_out" nolabel="1"/>
                                         <field name="sc_mms_out_rate" nolabel="1"/>
                                         <field name="sc_mms_out_price" nolabel="1"/>
+
+                                        <label for="smm_sms_in"/>
+                                        <field name="smm_sms_in" nolabel="1"/>
+                                        <field name="smm_sms_in_rate" nolabel="1"/>
+                                        <field name="smm_sms_in_price" nolabel="1"/>
+
+                                        <label for="smm_sms_out"/>
+                                        <field name="smm_sms_out" nolabel="1"/>
+                                        <field name="smm_sms_out_rate" nolabel="1"/>
+                                        <field name="smm_sms_out_price" nolabel="1"/>
+
 <!--
                                         <label for=""/>
                                         <field name="" nolabel="1"/>
@@ -152,14 +211,17 @@
 
  -->
                                     </group>
-                                    <group  col="4" string="Credits/Debits (Testing)">
+                                    <field name="display_adt" invisible="1"/>
+                                    <group string="Other Charges" attrs="{'invisible':[('display_adt', '!=', True)]}">
+                                        <field name="admin_debit_tids" nolabel="1"/>
+                                    </group>
+                                    <group string="Credits">
                                         <field name="credit_payment"/>
                                         <field name="credit_admin"/>
                                         <field name="credit_refund"/>
                                         <field name="credit_wire"/>
                                         <field name="credit_paypal"/>
                                         <field name="credit_bitcoin"/>
-                                        <field name="admin_debit_tids"/>
                                     </group>
                                     <group string="Summary">
                                         <field name="create_dt"/>

@@ -12,18 +12,41 @@ _logger = logging.getLogger(__name__)
 class teliapi(models.Model):
     _name = "teliapi.teliapi"
 
-    @api.multi
-    def create_user(self, params):
-        """ create_user - attempts to call the user signup API
-            params: A dict containing the following params
-             - token
-             - first_name
-             - last_name
-             - email
-             - phone
-             - username (optional)
-             - company_name (optional)
+    def _format_name(self, name):
+        """ _format_name - takes the entire name param and attempts to parse it
+            into only first and last names.  This assumes the number is formatted:
+            first_name (middle_name or initial) last_name.
+            @param name the value of the name field
+            @returns first_name, last_name
         """
+        if name:
+            name_array = name.split()
+        else:
+            return '', ''
+
+        if len(name_array) == 2:
+            return name_array[0], name_array[1]
+        else:
+            first_name = ' '.join(name_array[:-1])
+            last_name = name_array[-1]
+            return first_name, last_name
+
+    @api.multi
+    def create_user(self, token, name, email, phone, username, credit=25, company_name=False):
+        first_name, last_name = self._format_name(name)
+        params = {
+            'token': token,
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'phone': phone,
+            'username': username,
+            'credit': credit
+        }
+
+        if company_name:
+            params['company_name'] = company_name
+
         return Teliapi.create_user(params)
 
     @api.multi
@@ -82,3 +105,12 @@ class teliapi(models.Model):
         get_user_response = Teliapi.get_user()
 
         return get_user_response
+
+    @api.multi
+    def enable_offnet_dids(self, params):
+        """ enable_offnet_dids - tries to turn on offnet dids for a given teli_user_id
+            params:
+             - user_id: the teli user_id
+             - token: user's token
+        """
+        return Teliapi.enable_offnet_dids(params)

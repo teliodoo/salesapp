@@ -11,6 +11,8 @@ _logger = logging.getLogger(__name__)
 class TeliInvoice(models.Model):
     _name = 'teli.invoice'
 
+    _order = "create_dt DESC"
+
     def _calculate_rate(self, x, y):
         """
             _calculate_rate - simple method to calculate the per unit rate while
@@ -23,15 +25,18 @@ class TeliInvoice(models.Model):
 
     crm_lead_id = fields.Many2one('crm.lead', string='Account', index=True)
 
+    # Not used anymore but can't remove it because Odoo can't deal with changes...
+    channel_groups_qty = fields.Integer('Channel Groups Quantity', default=0, invisible=1)
+
     # Channel Groups ----------------------------------------------------------------------
-    channel_groups_qty = fields.Integer('Channel Groups Quantity', default=0)
+    channel_groups = fields.Integer('Channel Groups Quantity', default=0)
     channel_groups_price = fields.Float('Channel Groups Price', digits=(13, 2), default=0.0)
     channel_groups_rate = fields.Float('Channel Groups Rate', digits=(13, 6), compute='_compute_cg_rate')
 
     @api.one
-    @api.depends('channel_groups_qty', 'channel_groups_price')
+    @api.depends('channel_groups', 'channel_groups_price')
     def _compute_cg_rate(self):
-        self.channel_groups_rate = self._calculate_rate(self.channel_groups_price, self.channel_groups_qty)
+        self.channel_groups_rate = self._calculate_rate(self.channel_groups_price, self.channel_groups)
 
     # Local Numbers ----------------------------------------------------------------------
     local_numbers = fields.Integer('Local Numbers', default=0)
@@ -74,6 +79,7 @@ class TeliInvoice(models.Model):
         self.international_numbers_rate = self._calculate_rate(self.international_numbers_price, self.international_numbers)
 
     # LNP Requests ----------------------------------------------------------------------
+    # NOTE: not currently in invoice aggregate query
     lnp_requests = fields.Integer('LNP Requests', default=0)
     lnp_requests_price = fields.Float('LNP Requests Price', digits=(13, 2), default=0.0)
     lnp_requests_rate = fields.Float('LNP Requests Rate', digits=(13, 6), compute='_compute_lnp_rate')
@@ -273,6 +279,26 @@ class TeliInvoice(models.Model):
     def _compute_intl_mms_out_rate(self):
         self.intl_mms_out_rate = self._calculate_rate(self.intl_mms_out_price, self.intl_mms_out)
 
+    # SMM SMS Inbound ---------------------------------------------------------------------------------
+    smm_sms_in = fields.Integer('SMM Inbound', default=0)
+    smm_sms_in_price = fields.Float('SMM Inbound Price', digits=(13, 2), default=0.0)
+    smm_sms_in_rate = fields.Float('SMM Inbound Rate', digits=(13, 6), compute='_compute_smm_sms_in_rate')
+
+    @api.one
+    @api.depends('smm_sms_in', 'smm_sms_in_price')
+    def _compute_smm_sms_in_rate(self):
+        self.smm_sms_in_rate = self._calculate_rate(self.smm_sms_in_price, self.smm_sms_in)
+
+    # SMM SMS Outbound --------------------------------------------------------------------------------
+    smm_sms_out = fields.Integer('SMM Inbound', default=0)
+    smm_sms_out_price = fields.Float('SMM Inbound Price', digits=(13, 2), default=0.0)
+    smm_sms_out_rate = fields.Float('SMM Inbound Rate', digits=(13, 6), compute='_compute_smm_sms_out_rate')
+
+    @api.one
+    @api.depends('smm_sms_out', 'smm_sms_out_price')
+    def _compute_smm_sms_out_rate(self):
+        self.smm_sms_out_rate = self._calculate_rate(self.smm_sms_out_price, self.smm_sms_out)
+
     # Emergency 911 Service ----------------------------------------------------------------------
     e911 = fields.Integer('911 Service', default=0)
     e911_price = fields.Float('911 Service Price', digits=(13, 2), default=0.0)
@@ -283,6 +309,119 @@ class TeliInvoice(models.Model):
     def _compute_e911_rate(self):
         self.e911_rate = self._calculate_rate(self.e911_price, self.e911)
 
+    # ------------------------------------------------------------------------- [voice_did_tf_in]
+    voice_did_tf_in = fields.Integer('Voice Tollfree In', default=0)
+    voice_did_tf_in_price = fields.Float('Voice Tollfree In Price', digits=(13, 2), default=0.0)
+    voice_did_tf_in_rate = fields.Float('Voice Tollfree In Rate', digits=(13, 6), compute='_compute_voice_did_tf_in')
+
+    @api.one
+    @api.depends('voice_did_tf_in', 'voice_did_tf_in_price')
+    def _compute_voice_did_tf_in(self):
+        self.voice_did_tf_in_rate = self._calculate_rate(self.voice_did_tf_in_price, self.voice_did_tf_in)
+
+    # ------------------------------------------------------------------------- [voice_did_local_in]
+    voice_did_local_in = fields.Integer('Voice Local In', default=0)
+    voice_did_local_in_price = fields.Float('Voice Local In Price', digits=(13, 2), default=0.0)
+    voice_did_local_in_rate = fields.Float('Voice Local In Rate', digits=(13, 6), compute='_compute_voice_did_local_in')
+
+    @api.one
+    @api.depends('voice_did_local_in', 'voice_did_local_in_price')
+    def _compute_voice_did_local_in(self):
+        self.voice_did_local_in_rate = self._calculate_rate(self.voice_did_local_in_price, self.voice_did_local_in)
+
+    # ------------------------------------------------------------------------- [voice_did_intl_in]
+    voice_did_intl_in = fields.Integer('Voice International In', default=0)
+    voice_did_intl_in_price = fields.Float('Voice International In Price', digits=(13, 2), default=0.0)
+    voice_did_intl_in_rate = fields.Float('Voice International In Rate', digits=(13, 6),
+                                          compute='_compute_voice_did_intl_in')
+
+    @api.one
+    @api.depends('voice_did_intl_in', 'voice_did_intl_in_price')
+    def _compute_voice_did_intl_in(self):
+        self.voice_did_intl_in_rate = self._calculate_rate(self.voice_did_intl_in_price, self.voice_did_intl_in)
+
+    # ------------------------------------------------------------------------- [voice_term_usa_out]
+    voice_term_usa_out = fields.Integer('Voice Term USA Out', default=0)
+    voice_term_usa_out_price = fields.Float('Voice Term USA Out Price', digits=(13, 2), default=0.0)
+    voice_term_usa_out_rate = fields.Float('Voice Term USA Out Rate', digits=(13, 6),
+                                           compute='_compute_voice_term_usa_out')
+
+    @api.one
+    @api.depends('voice_term_usa_out', 'voice_term_usa_out_price')
+    def _compute_voice_term_usa_out(self):
+        self.voice_term_usa_out_rate = self._calculate_rate(self.voice_term_usa_out_price, self.voice_term_usa_out)
+
+    # ------------------------------------------------------------------------- [voice_term_intl_out]
+    voice_term_intl_out = fields.Integer('Voice Term International Out', default=0)
+    voice_term_intl_out_price = fields.Float('Voice Term International Out Price', digits=(13, 2), default=0.0)
+    voice_term_intl_out_rate = fields.Float('Voice Term International Out Rate', digits=(13, 6),
+                                            compute='_compute_voice_term_intl_out')
+
+    @api.one
+    @api.depends('voice_term_intl_out', 'voice_term_intl_out_price')
+    def _compute_voice_term_intl_out(self):
+        self.voice_term_intl_out_rate = self._calculate_rate(self.voice_term_intl_out_price, self.voice_term_intl_out)
+
+    # ------------------------------------------------------------------------- [voice_term_tf_out]
+    voice_term_tf_out = fields.Integer('Voice Term Tollfree Out', default=0)
+    voice_term_tf_out_price = fields.Float('Voice Term Tollfree Out Price', digits=(13, 2), default=0.0)
+    voice_term_tf_out_rate = fields.Float('Voice Term Tollfree Out Rate', digits=(13, 6),
+                                          compute='_compute_voice_term_tf_out')
+
+    @api.one
+    @api.depends('voice_term_tf_out', 'voice_term_tf_out_price')
+    def _compute_voice_term_tf_out(self):
+        self.voice_term_tf_out_rate = self._calculate_rate(self.voice_term_tf_out_price, self.voice_term_tf_out)
+
+    # ------------------------------------------------------------------------- [voice_term_fax_out]
+    voice_term_fax_out = fields.Integer('Voice Term Fax Out', default=0)
+    voice_term_fax_out_price = fields.Float('Voice Term Fax Out Price', digits=(13, 2), default=0.0)
+    voice_term_fax_out_rate = fields.Float('Voice Term Fax Out Rate', digits=(13, 6),
+                                           compute='_compute_voice_term_fax_out')
+
+    @api.one
+    @api.depends('voice_term_fax_out', 'voice_term_fax_out_price')
+    def _compute_voice_term_fax_out(self):
+        self.voice_term_fax_out_rate = self._calculate_rate(self.voice_term_fax_out_price, self.voice_term_fax_out)
+
+    # NOTE: These are additional types found in teli_cust_agg, but don't appear to be used... yet?
+    # billing_dids_tf
+    # billing_dids_intl
+    # billing_dids_local
+    # billing_dids_e911
+    # billing_dids_offnet
+    # billing_dids_channelgroups
+    # billing_dids_shortcode
+    # billing_dids_nrc
+    # billing_dids_porting
+    # billing_dids_vanity
+    # billing_services_hosting
+    # billing_services_other
+    # billing_dids_total_monthly
+    # billing_services_total_monthly
+
+    # ------------------------------------------------------------------------- [billing_cnam_query]
+    billing_cnam_query = fields.Integer('Billing CNAM Query', default=0)
+    billing_cnam_query_price = fields.Float('Billing CNAM Query Price', digits=(13, 2), default=0.0)
+    billing_cnam_query_rate = fields.Float('Billing CNAM Query Rate', digits=(13, 6),
+                                           compute='_compute_billing_cnam_query')
+
+    @api.one
+    @api.depends('billing_cnam_query', 'billing_cnam_query_price')
+    def _compute_billing_cnam_query(self):
+        self.billing_cnam_query_rate = self._calculate_rate(self.billing_cnam_query_price, self.billing_cnam_query)
+
+    # ------------------------------------------------------------------------- [billing_lrn_query]
+    billing_lrn_query = fields.Integer('Billing LRN Query', default=0)
+    billing_lrn_query_price = fields.Float('Billing LRN Query Price', digits=(13, 2), default=0.0)
+    billing_lrn_query_rate = fields.Float('Billing LRN Query Rate', digits=(13, 6),
+                                          compute='_compute_billing_lrn_query')
+
+    @api.one
+    @api.depends('billing_lrn_query', 'billing_lrn_query_price')
+    def _compute_billing_lrn_query(self):
+        self.billing_lrn_query_rate = self._calculate_rate(self.billing_lrn_query_price, self.billing_lrn_query)
+
     # Summary Information -----------------------------------------------------------------------
     credit_payment = fields.Float('Credit Payment')
     credit_admin = fields.Float(' Credit Admin')
@@ -290,7 +429,18 @@ class TeliInvoice(models.Model):
     credit_wire = fields.Float('Credit Wire')
     credit_paypal = fields.Float('Credit Paypal')
     credit_bitcoin = fields.Float('Credit Bitcoin')
-    admin_debit_tids = fields.Float('Admin Debit')
+    display_adt = fields.Boolean('Display Admin Debits TransactionIds?', default=False, compute='_compute_display_adt')
+    adjustment_total = fields.Float('Transaction Totals', digits=(13, 2), default=0.0, readonly=True)
+    admin_debit_tids = fields.Html('Other Charges', readonly=True, default="SKIPME")
+
+    @api.one
+    @api.depends('admin_debit_tids')
+    def _compute_display_adt(self):
+        _logger.debug("value of admin_debit_tids is: " + self.admin_debit_tids)
+        if "SKIPME" in self.admin_debit_tids:
+            self.display_adt = False
+        else:
+            self.display_adt = True
 
     total_price = fields.Float('Total Amount:', compute='_compute_total_price')
     total_credits = fields.Float('Total Credits', compute='_compute_total_credits')
@@ -302,7 +452,10 @@ class TeliInvoice(models.Model):
                  'local_sms_out_price', 'local_mms_in_price', 'local_mms_out_price', 'sc_sms_in_price',
                  'sc_sms_out_price', 'sc_mms_in_price', 'sc_mms_out_price', 'tf_sms_in_price', 'tf_sms_out_price',
                  'tf_mms_in_price', 'tf_mms_out_price', 'intl_sms_in_price', 'intl_sms_out_price',
-                 'intl_mms_in_price', 'intl_mms_out_price', 'e911_price')
+                 'intl_mms_in_price', 'intl_mms_out_price', 'smm_sms_in_price', 'smm_sms_out_price', 'e911_price',
+                 'voice_did_tf_in_price', 'voice_did_intl_in_price', 'voice_did_local_in_price',
+                 'voice_term_usa_out_price', 'voice_term_intl_out_price', 'voice_term_tf_out_price',
+                 'voice_term_fax_out_price', 'billing_lrn_query_price', 'billing_cnam_query_price', 'adjustment_total')
     def _compute_total_price(self):
         amounts_list = [self.channel_groups_price, self.local_numbers_price, self.tollfree_numbers_price,
                         self.offnet_numbers_price, self.international_numbers_price, self.lnp_requests_price,
@@ -311,7 +464,11 @@ class TeliInvoice(models.Model):
                         self.local_mms_out_price, self.sc_sms_in_price, self.sc_sms_out_price, self.sc_mms_in_price,
                         self.sc_mms_out_price, self.tf_sms_in_price, self.tf_sms_out_price, self.tf_mms_in_price,
                         self.tf_mms_out_price, self.intl_sms_in_price, self.intl_sms_out_price,
-                        self.intl_mms_in_price, self.intl_mms_out_price, self.e911_price]
+                        self.intl_mms_in_price, self.intl_mms_out_price, self.smm_sms_in_price, self.smm_sms_out_price,
+                        self.e911_price, self.voice_did_tf_in_price, self.voice_did_intl_in_price,
+                        self.voice_did_local_in_price, self.voice_term_usa_out_price, self.voice_term_intl_out_price,
+                        self.voice_term_tf_out_price, self.voice_term_fax_out_price, self.billing_lrn_query_price,
+                        self.billing_cnam_query_price, self.adjustment_total]
         self.total_price = sum(amounts_list)
 
     @api.one

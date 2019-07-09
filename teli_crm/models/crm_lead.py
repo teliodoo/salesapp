@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import logging
+import datetime
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
@@ -14,18 +15,37 @@ class teli_crm(models.Model):
 
     partner_ids = fields.Many2many(comodel_name='res.partner', relation='teli_crm_partnerm2m',
                                    column1='lead_id', column2='partner_id', string='Contacts')
+    teli_lead_status = fields.Selection([
+        ('open', 'Open'),
+        ('qualifying', 'Qualifying'),
+        ('recycled', 'Recycled'),
+        ('unqualified', 'Unqualified'),
+        ('dead', 'Dead')
+    ], 'Lead Status')
     teli_user_id = fields.Char('teli user id')
     teli_company_name = fields.Char('Company Name')
     username = fields.Char('Username', help='Provide the username you want to assign to the lead')
     uuid = fields.Char('Uuid', help='The accounts unique identifier', readonly=True)
     account_credit = fields.Char('Initial Account Credit', default='25')
+    account_status = fields.Selection([
+        ('active', 'Active'),
+        ('inactive-disabled', 'Disabled'),
+        ('inactive-no-funds-soft', 'No Funds - Soft Inactive'),
+        ('inactive-no-funds-hard', 'No Funds - Hard Inactive'),
+        ('inactive-fraud', 'Inactive Fraud'),
+        ('pending-approval', 'Pending Approval')
+    ], 'Teli User Status')
+    skip_constrains_test = True
+    # teli_revenue = fields.Char('Revenue')
+    # teli_usage = fields.Char('Usage')
 
     # qualification questions
     monthly_usage = fields.Char(string='Number of monthly messages/minutes?')
     number_of_dids = fields.Char(string='How many DIDs are in service?')
-    potential = fields.Char(string='What is the potential revenue?')
+    potential = fields.Char(string='What is the potential revenue per month?')
     current_service = fields.Char(string='What type of services are they currently using today in their company?')
-    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?', help='Under Contract?')
+    under_contract = fields.Char(string='Are open and available to review and bring on new vendors?',
+                                 help='Under Contract?')
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
     buying_motivation = fields.Selection([
@@ -73,66 +93,40 @@ class teli_crm(models.Model):
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
                                 string="Gateways Needed")
-
-    def _format_name(self, name):
-        """ _format_name - takes the entire name param and attempts to parse it
-            into only first and last names.  This assumes the number is formatted:
-            first_name (middle_name or initial) last_name.
-            @param name the value of the name field
-            @returns first_name, last_name
-        """
-        if name:
-            name_array = name.split()
-        else:
-            return '', ''
-
-        if len(name_array) == 2:
-            return name_array[0], name_array[1]
-        else:
-            first_name = ' '.join(name_array[:-1])
-            last_name = name_array[-1]
-            return first_name, last_name
+    month_to_date = fields.Float('Month to Date Total', digits=(13, 2), compute="_calc_month_to_date")
 
     def _call_signup_user(self):
         # make call get data
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
 
-        # Need to check if the lead was created by the daily cron Job
-        user_check = self._call_fetch_user()
-        if 'id' in user_check and user_check['id'] == self.teli_user_id and 'auth_token' in user_check and user_check['auth_token'] == self.uuid:
-            return False
-
-        # attempt to create the account
-        first_name, last_name = self._format_name(self.contact_name)
-        params = {
-            'first_name': first_name,
-            'last_name': last_name,
-            'phone': self.mobile if self.mobile else self.phone,
-            'email': self.email_from,
-            'username': self.username if self.username else "%s.%s" % (first_name, last_name),
-            'company_name': self.teli_company_name,
-            'credit': self.account_credit,
-            'token': current_user.teli_token,
-        }
-
-        create_response = teliapi.create_user(params)
+        create_response = teliapi.create_user(
+            current_user.teli_token,
+            self.contact_name,
+            self.email_from,
+            self.mobile if self.mobile else self.phone,
+            self.username,
+            self.account_credit,
+            self.teli_company_name
+        )
 
         # Check the response and set a note if the call was successful or not
         if create_response['code'] is not 200:
             self.message_post(content_subtype='plaintext', subject='teli API Warning',
                               body='[WARNING] Received the following error from teli: %s' % create_response['data'])
-        else:
-            self.message_post(content_subtype='plaintext', subject='teli API Note',
-                              body='[SUCCESS] New account was successfully created.')
+            return False
 
-            # if success, try to grab the uuid and update the oppr/acct
-            user_response = teliapi.find_by_username({
-                'token': current_user.teli_token,
-                'username': self.username if self.username else "%s.%s" % (first_name, last_name)
-            })
-            self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
-            self.teli_user_id = user_response['id'] if 'id' in user_response else ''
+        self.message_post(content_subtype='plaintext', subject='teli API Note',
+                          body='[SUCCESS] New account was successfully created.')
+
+        # if success, try to grab the uuid and update the oppr/acct
+        user_response = teliapi.find_by_username({
+            'token': current_user.teli_token,
+            'username': self.username
+        })
+        self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
+        self.teli_user_id = user_response['id'] if 'id' in user_response else ''
+        return True
 
     def _call_fetch_user(self):
         teliapi = self.env['teliapi.teliapi']
@@ -146,47 +140,57 @@ class teli_crm(models.Model):
     @api.multi
     def close_dialog(self):
         _logger.debug('hit close_dialog')
-        self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
-        self._call_signup_user()
+        self.skip_constrains_test = False
 
-        return super().close_dialog()
+        if not self._call_signup_user():
+            raise ValidationError("An error occurred while attempting to create the account.")
+        self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
+
+        result = super().close_dialog()
+        self.skip_constrains_test = True
+        return result
 
     @api.multi
     def edit_dialog(self):
         _logger.debug('hit edit_dialog')
+        self.skip_constrains_test = False
+
+        if not self._call_signup_user():
+            raise ValidationError("An error occurred while attempting to create the account.")
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
-        self._call_signup_user()
 
-        return super().edit_dialog()
-
-    @api.multi
-    def handle_partner_assignation(self, action='create', partner_id=False):
-        _logger.debug('hit handle_partner_assignation')
-        result = super().handle_partner_assignation(action, partner_id)
-        _logger.debug('the parent completed, and now we can create the user on teli')
-        self._call_signup_user()
-
+        result = super().edit_dialog()
+        self.skip_constrains_test = True
         return result
 
-    @api.onchange('invoice_term')
-    def _onchange_invoice_term(self):
+    # --------------------------------------------------------------------------
+    #   Computed
+    # --------------------------------------------------------------------------
+    @api.depends()
+    def _calc_month_to_date(self):
+        last_month = datetime.date.today() - datetime.timedelta(days=30)
+        last_month = last_month.__str__()
+        ia = self.env['teli.invoice'].search([
+            ('crm_lead_id', '=', self.id),
+            ('create_dt', '>', last_month)
+        ])
+
+        _logger.debug('count of teli.invoice: %s' % len(ia))
+        for agg in ia:
+            _logger.debug(' * %s' % agg.total_price)
+            self.month_to_date += agg.total_price
+
+    # --------------------------------------------------------------------------
+    #   Constrains
+    # --------------------------------------------------------------------------
+    @api.multi
+    @api.constrains('invoice_term')
+    def _set_invoice_term(self):
+        if not self.teli_user_id:
+            return {}
+
         teliapi = self.env['teliapi.teliapi']
         current_user = self.env['res.users'].browse(self.user_id.id)
-
-        # If the account was created before the addition of invoice_term, then
-        # attempt to get the teli_user_id from the API.
-        if not self.teli_user_id:
-            result = self._call_fetch_user()
-            if 'id' in result:
-                self.uuid = result['auth_token'] if 'auth_token' in result else ''
-                self.teli_user_id = result['id'] if 'id' in result else ''
-            else:
-                return {
-                    'warning': {
-                        'title': 'Unable to Find User',
-                        'message': 'Could not set invoice term'
-                    }
-                }
 
         response = teliapi.set_invoice_term({
             'user_id': self.teli_user_id,
@@ -194,29 +198,51 @@ class teli_crm(models.Model):
             'token': current_user.teli_token
         })
 
-        if response['status'] is not 'success':
+        if response['code'] is not 200:
             self.message_post(subject='teli API Warning',
                               body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
-
-    # --------------------------------------------------------------------------
-    #   Constrains
-    # --------------------------------------------------------------------------
 
     @api.multi
     @api.constrains('username')
     def _lookup_teli_username(self):
+        if self.skip_constrains_test:
+            _logger.warn('Skipping username constraint test')
+            return True
+
         user_response = self._call_fetch_user()
 
-        if 'auth_token' in user_response and user_response['auth_token'] != self.uuid:
+        # Check to see if we get a "User not found" response from the teli API
+        # elif the username requested returns a valid user object, then that account exists and a new username is needed
+        if 'code' in user_response and user_response['code'] != 200 and user_response['data'] != 'User not found':
+            raise ValidationError("An error occurred: %s" % user_response['data'])
+        elif all(k in user_response for k in ("id", "username", "email", "auth_token")):
             raise ValidationError("It appears '%s' is taken.  Try another username." % self.username)
 
     @api.multi
     @api.constrains('potential')
     def _valid_potential_value(self):
         try:
-            temp = int(self.potential)
+            if self.potential[0] == '$':
+                float(self.potential[1:])
+            else:
+                float(self.potential)
         except ValueError:
-            raise ValidationError('"What is the potential revenue?" must be a numeric value.')
+            raise ValidationError('"What is the potential revenue per month?" must be a numeric value.')
+
+    @api.multi
+    @api.constrains('offnet_dids')
+    def _enable_offnet_dids(self):
+        teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
+        _logger.debug('offnet_dids is: %s' % self.offnet_dids)
+
+        if self.offnet_dids:
+            result = teliapi.enable_offnet_dids({
+                'token': current_user.teli_token,
+                'user_id': self.teli_user_id
+            })
+            if result['code'] is not 200:
+                self.message_post(subject='teli API Warning', body='<h2>[WARNING]</h2><p>%s</p>' % result['data'])
 
 
 class TeliProducts(models.Model):
@@ -225,7 +251,7 @@ class TeliProducts(models.Model):
     name = fields.Char('Name', required=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique (name)', "Tag name already exists !"),
+        ('name_uniq', 'unique (name)', "Tag name already exists!"),
     ]
 
 
@@ -235,5 +261,5 @@ class Gateways(models.Model):
     name = fields.Char('Name', required=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique (name)', "Tag name already exists !"),
+        ('name_uniq', 'unique (name)', "Tag name already exists!"),
     ]

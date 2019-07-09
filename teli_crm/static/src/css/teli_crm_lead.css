@@ -1,0 +1,27 @@
+
+.teli_horizontal_cb > div {
+    float: left;
+    width: 200px;
+}
+
+.o_thread_message_content > dl {
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    padding-right: 9.6px;
+    margin: 0;
+}
+
+.o_thread_message_content > dl > dt {
+    float: left;
+    width: 60%;
+    padding: 1em 0em;
+    border-top: 1px solid black;
+}
+
+.o_thread_message_content > dl > dd {
+    float: left;
+    width: 40%;
+    padding: 1em 0px;
+    border-top: 1px solid black;
+}

@@ -70,7 +70,7 @@ class Teliapi(http.Controller):
             _logger.debug("%s => %s" % (key, value))
 
         # optional param, but will probably be needed/supplied by sales
-        if params['company_name']:
+        if 'company_name' in params:
             request_params['company_name'] = params['company_name']
 
         if new_username:
@@ -108,11 +108,11 @@ class Teliapi(http.Controller):
         # check the response for no data returned
         if response['code'] is not 200:
             _logger.warning('[ERROR][%s] received an error: %s' % (response['code'], response['data']))
-            return {}
+            return response
 
         if len(response['data']) is 0:
             _logger.warning('No results found')
-            return {}
+            return response
 
         # search the data for the recently created user account
         for user in response['data']:
@@ -122,7 +122,7 @@ class Teliapi(http.Controller):
                 return user
 
         _logger.warning('Couldn\'t find the correct user...')
-        return {}
+        return response
 
     @classmethod
     def set_invoice_term(self, params):
@@ -140,6 +140,15 @@ class Teliapi(http.Controller):
             returns: a json structure
         """
         return self._call('/user/get', alt_host='https://apiv1.teleapi.net')['data']
+
+    @classmethod
+    def enable_offnet_dids(self, params):
+        """ enable_offnet_dids - attempts to enable offnet dids
+        """
+        return self._call('/user/offnet/enable', {
+            'token': params['token'],
+            'user_id': params['user_id']
+        })
 
     @http.route('/teliapi/user/get', type='http', auth='user')
     def get_user_direct(self):
