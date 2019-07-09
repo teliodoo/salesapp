@@ -111,5 +111,6 @@ class teliapi(models.Model):
         """ enable_offnet_dids - tries to turn on offnet dids for a given teli_user_id
             params:
              - user_id: the teli user_id
+             - token: user's token
         """
         return Teliapi.enable_offnet_dids(params)

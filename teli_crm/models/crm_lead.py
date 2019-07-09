@@ -233,10 +233,14 @@ class teli_crm(models.Model):
     @api.constrains('offnet_dids')
     def _enable_offnet_dids(self):
         teliapi = self.env['teliapi.teliapi']
+        current_user = self.env['res.users'].browse(self.user_id.id)
         _logger.debug('offnet_dids is: %s' % self.offnet_dids)
 
         if self.offnet_dids:
-            result = teliapi.enable_offnet_dids({'user_id': self.teli_user_id})
+            result = teliapi.enable_offnet_dids({
+                'token': current_user.teli_token,
+                'user_id': self.teli_user_id
+            })
             if result['code'] is not 200:
                 self.message_post(subject='teli API Warning', body='<h2>[WARNING]</h2><p>%s</p>' % result['data'])
 

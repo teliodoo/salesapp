@@ -146,6 +146,7 @@ class Teliapi(http.Controller):
         """ enable_offnet_dids - attempts to enable offnet dids
         """
         return self._call('/user/offnet/enable', {
+            'token': params['token'],
             'user_id': params['user_id']
         })
 
