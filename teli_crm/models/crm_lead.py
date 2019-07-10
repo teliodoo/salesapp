@@ -95,10 +95,22 @@ class teli_crm(models.Model):
                                 string="Gateways Needed")
     month_to_date = fields.Float('Month to Date Total', digits=(13, 2), compute="_calc_month_to_date")
 
+    def _get_current_user(self):
+        # Attempts to retrieve the current user, either the sales person's object or who is currently logged in
+        current_user = self.env['res.users'].browse(
+            self.user_id.id if self.user_id.id else self.env.user.id)
+        _logger.debug(current_user.teli_token)
+        _logger.debug({
+            'env': self.env.user.id,
+            'user_id': self.user_id.id
+        })
+
+        return current_user
+
     def _call_signup_user(self):
         # make call get data
         teliapi = self.env['teliapi.teliapi']
-        current_user = self.env['res.users'].browse(self.user_id.id)
+        current_user = self._get_current_user()
 
         create_response = teliapi.create_user(
             current_user.teli_token,
@@ -130,7 +142,7 @@ class teli_crm(models.Model):
 
     def _call_fetch_user(self):
         teliapi = self.env['teliapi.teliapi']
-        current_user = self.env['res.users'].browse(self.user_id.id)
+        current_user = self._get_current_user()
         _logger.debug('calling find_by_username for: %s' % self.username)
         return teliapi.find_by_username({
             'token': current_user.teli_token,
@@ -190,7 +202,8 @@ class teli_crm(models.Model):
             return {}
 
         teliapi = self.env['teliapi.teliapi']
-        current_user = self.env['res.users'].browse(self.user_id.id)
+        current_user = self._get_current_user()
+        _logger.debug(current_user.teli_token)
 
         response = teliapi.set_invoice_term({
             'user_id': self.teli_user_id,
@@ -233,7 +246,7 @@ class teli_crm(models.Model):
     @api.constrains('offnet_dids')
     def _enable_offnet_dids(self):
         teliapi = self.env['teliapi.teliapi']
-        current_user = self.env['res.users'].browse(self.user_id.id)
+        current_user = self._get_current_user()
         _logger.debug('offnet_dids is: %s' % self.offnet_dids)
 
         if self.offnet_dids:
