@@ -200,7 +200,7 @@ class teli_crm(models.Model):
 
         if response['code'] is not 200:
             self.message_post(subject='teli API Warning',
-                              body='<h2>[WARNING]</h2><p>%s</p>' % response['data'])
+                              body='<h2>[WARNING] Set Invoice Terms</h2><p>%s</p>' % response['data'])
 
     @api.multi
     @api.constrains('username')
@@ -238,11 +238,12 @@ class teli_crm(models.Model):
 
         if self.offnet_dids:
             result = teliapi.enable_offnet_dids({
-                'token': current_user.teli_token,
-                'user_id': self.teli_user_id
+                'user_id': self.teli_user_id,
+                'token': current_user.teli_token
             })
             if result['code'] is not 200:
-                self.message_post(subject='teli API Warning', body='<h2>[WARNING]</h2><p>%s</p>' % result['data'])
+                self.message_post(subject='teli API Warning',
+                                  body='<h2>[WARNING] Offnet DIDs Enable</h2><p>%s</p>' % result['data'])
 
 
 class TeliProducts(models.Model):

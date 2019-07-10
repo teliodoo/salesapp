@@ -34,8 +34,18 @@ class Teliapi(http.Controller):
             _logger.debug(json.dumps(content))
 
             if response.status_code != 200 or content['code'] != 200:
-                _logger.error("[%s] Received non-200 status code" %
-                              (response.status_code if response.status_code != 200 else content['code']))
+                _logger.error("[%s] Received non-200 status code: %s" % (
+                    (response.status_code if response.status_code != 200 else content['code']),
+                    content['data']
+                ))
+                _logger.error("[%s] url: %s" % (
+                    (response.status_code if response.status_code != 200 else content['code']),
+                    url
+                ))
+                _logger.error("[%s] params: %s" % (
+                    (response.status_code if response.status_code != 200 else content['code']),
+                    json.dumps(params)
+                ))
                 return content
         except ValueError:
             # according to the requests webpage, a ValueError can occur when
