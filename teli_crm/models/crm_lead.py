@@ -96,9 +96,9 @@ class teli_crm(models.Model):
     month_to_date = fields.Float('Month to Date Total', digits=(13, 2), compute="_calc_month_to_date")
 
     def _get_current_user(self):
-        # Attempts to retrieve the current user, either the sales person's object or who is currently logged in
-        current_user = self.env['res.users'].browse(
-            self.user_id.id if self.user_id.id else self.env.user.id)
+        # originally i was browsing with self.user_id.id, but that caused API changes to potentially show
+        # the wrong user made the change.  Going to force the current environment user id going forward.
+        current_user = self.env['res.users'].browse(self.env.user.id)
         _logger.debug(current_user.teli_token)
         _logger.debug({
             'env': self.env.user.id,
