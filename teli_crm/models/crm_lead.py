@@ -180,13 +180,14 @@ class teli_crm(models.Model):
     # --------------------------------------------------------------------------
     @api.depends()
     def _calc_month_to_date(self):
-        last_month = datetime.date.today() - datetime.timedelta(days=30)
-        last_month = last_month.__str__()
+        first_day_of_month = datetime.date.today()
+        first_day_of_month = first_day_of_month.replace(day=1).__str__()
         ia = self.env['teli.invoice'].search([
             ('crm_lead_id', '=', self.id),
-            ('create_dt', '>', last_month)
+            ('create_dt', '>=', first_day_of_month)
         ])
 
+        _logger.debug('working with date: %s' % first_day_of_month)
         _logger.debug('count of teli.invoice: %s' % len(ia))
         for agg in ia:
             _logger.debug(' * %s' % agg.total_price)
