@@ -82,8 +82,8 @@ class teli_crm(models.Model):
             ('teli', 'teli Test Account')
         ], 'Invoice Terms', default='none')
     offnet_dids = fields.Boolean('Enable Offnet DIDs?')
-    inbound_channel_limit = fields.Integer('Inbound Channel Limit')
-    outbound_channel_limit = fields.Integer('Outbound Channel Limit')
+    inbound_channel_limit = fields.Integer('Inbound Channel Limit', default=10)
+    outbound_channel_limit = fields.Integer('Outbound Channel Limit', default=10)
     international_sms = fields.Boolean('Enable International SMS?')
     usf_exempt = fields.Boolean('USF Exempt')
     white_labeling = fields.Boolean('Reselling/White Labeling our Services')
@@ -93,7 +93,8 @@ class teli_crm(models.Model):
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
                                 string="Gateways Needed")
-    month_to_date = fields.Float('Month to Date Total', digits=(13, 2), compute="_calc_month_to_date")
+    month_to_date = fields.Float('Current MTD Total', digits=(13, 2), compute="_calc_month_to_date")
+    prev_mtd = fields.Float('Previous MTD Total', digits=(13, 2), compute="_calc_prev_mtd")
 
     def _get_current_user(self):
         # originally i was browsing with self.user_id.id, but that caused API changes to potentially show
@@ -192,6 +193,24 @@ class teli_crm(models.Model):
         for agg in ia:
             _logger.debug(' * %s' % agg.total_price)
             self.month_to_date += agg.total_price
+
+    @api.depends()
+    def _calc_prev_mtd(self):
+        first_day_of_month = datetime.date.today().replace(month=datetime.date.today().month-1, day=1).__str__()
+        last_day_of_month = (datetime.date.today().replace(day=1) - datetime.timedelta(days=1)).__str__()
+        _logger.debug('first DOM: %s' % first_day_of_month)
+        _logger.debug('last DOM: %s' % last_day_of_month)
+
+        ia = self.env['teli.invoice'].search([
+            ('crm_lead_id', '=', self.id),
+            # '&',
+            ('create_dt', '>=', first_day_of_month),
+            ('create_dt', '<=', last_day_of_month)
+        ])
+
+        for agg in ia:
+            _logger.debug(' * %s' % agg.total_price)
+            self.prev_mtd += agg.total_price
 
     # --------------------------------------------------------------------------
     #   Constrains

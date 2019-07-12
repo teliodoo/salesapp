@@ -11,11 +11,12 @@
                         <page string="Invoice Data">
                             <group>
                                 <field name="month_to_date"/>
+                                <field name="prev_mtd"/>
                             </group>
                             <field name="invoices">
-                                <tree>
-                                    <field name="create_dt"/>
-                                    <field name="modify_dt"/>
+                                <tree limit="30">
+                                    <field name="create_dt" widget="date"/>
+                                    <!-- <field name="modify_dt"/> -->
                                     <field name="total_price"/>
                                     <field name="total_credits"/>
                                 </tree>
