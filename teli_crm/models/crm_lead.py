@@ -48,10 +48,7 @@ class teli_crm(models.Model):
                                  help='Under Contract?')
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
-    buying_motivation = fields.Selection([
-            ('pain', 'Pain'),
-            ('gain', 'Gain')
-        ], 'What\'s the primary motivation for choosing teli?')
+    buying_motivation = fields.Char(string='What\'s the primary motivation for choosing teli?')
     decision_maker = fields.Selection([
             ('decision_maker', 'End Decision Maker'),
             ('influencer', 'Large Influencer'),
@@ -139,6 +136,17 @@ class teli_crm(models.Model):
         })
         self.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
         self.teli_user_id = user_response['id'] if 'id' in user_response else ''
+
+        # If the "enable offnet dids" is checked, then call the api
+        if self.offnet_dids:
+            result = teliapi.enable_offnet_dids({
+                'user_id': self.teli_user_id,
+                'token': current_user.teli_token
+            })
+            if result['code'] is not 200:
+                self.message_post(subject='teli API Warning',
+                                  body='<h2>[WARNING] Offnet DIDs Enable</h2><p>%s</p>' % result['data'])
+
         return True
 
     def _call_fetch_user(self):

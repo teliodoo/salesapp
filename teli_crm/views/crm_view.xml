@@ -99,6 +99,12 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
                 <data>
+                    <xpath expr="//field[@name='planned_revenue']" position="replace">
+                        <field name="planned_revenue" attrs="{'readonly': [('stage_id', '=', 4)]}"/>
+                    </xpath>
+                    <xpath expr="//field[@name='probability']" position="replace">
+                        <field name="probability" attrs="{'readonly': [('stage_id', '=', 4)]}"/>
+                    </xpath>
                     <xpath expr="//field[@name='partner_id']" position="after">
                         <field name="teli_company_name"/>
                         <field name="account_status" readonly="1"/>
