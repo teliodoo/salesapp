@@ -47,6 +47,7 @@ class teli_crm(models.Model):
     under_contract = fields.Char(string='Are open and available to review and bring on new vendors?',
                                  help='Under Contract?')
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
+    use_case_explanation = fields.Text(string='What does the company do?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
     buying_motivation = fields.Char(string='What\'s the primary motivation for choosing teli?')
     decision_maker = fields.Selection([

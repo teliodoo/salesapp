@@ -33,6 +33,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
     under_contract = fields.Char(string='Are open and available to review and bring on new vendors?',
                                  help='Under Contract?', required=True)
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
+    use_case_explanation = fields.Text(string='What does the company do?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
     buying_motivation = fields.Selection([
             ('pain', 'Pain?'),
@@ -75,6 +76,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
         result['current_service'] = lead.current_service
         result['under_contract'] = lead.under_contract
         result['valid_use_case'] = lead.valid_use_case
+        result['use_case_explanation'] = lead.use_case_explanation
         result['share_rates'] = lead.share_rates
         result['buying_motivation'] = lead.buying_motivation
         result['decision_maker'] = lead.decision_maker
@@ -107,6 +109,8 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 <dd>'{under_contract}'</dd>
                 <dt>Valid use case and overview of their business model?</dt>
                 <dd>'{use_case}'</dd>
+                <dt>What does the company do?</dt>
+                <dd>'{use_case_explanation}'</dd>
                 <dt>Willing to share target rates?</dt>
                 <dd>'{share_rates}'</dd>
                 <dt>What's the primary motivation for choosing teli?</dt>
@@ -131,6 +135,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
                 services=self.current_service,
                 under_contract=self.under_contract,
                 use_case='yes' if self.valid_use_case else 'no',
+                use_case_explanation=self.use_case_explanation,
                 share_rates='yes' if self.share_rates else 'no',
                 motivation=self.buying_motivation,
                 decision_maker=self.decision_maker,
@@ -165,6 +170,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.current_service = self.current_service
         lead.under_contract = self.under_contract
         lead.valid_use_case = self.valid_use_case
+        lead.use_case_explanation = self.use_case_explanation
         lead.share_rates = self.share_rates
         lead.buying_motivation = self.buying_motivation
         lead.decision_maker = self.decision_maker

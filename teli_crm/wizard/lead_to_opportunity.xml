@@ -48,6 +48,9 @@
                             <label for="valid_use_case" colspan="3"/>
                             <field name="valid_use_case" colspan="1" nolabel="1"/>
 
+                            <label for="use_case_explanation" colspan="3"/>
+                            <field name="use_case_explanation" colspan="1" nolabel="1"/>
+
                             <label for="share_rates" colspan="3"/>
                             <field name="share_rates" colspan="1" nolabel="1"/>
 
