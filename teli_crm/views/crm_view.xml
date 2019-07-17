@@ -103,10 +103,10 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//field[@name='planned_revenue']" position="replace">
-                        <field name="planned_revenue" attrs="{'readonly': [('stage_id', '=', 4)]}"/>
+                        <field name="planned_revenue" attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
                     </xpath>
                     <xpath expr="//field[@name='probability']" position="replace">
-                        <field name="probability" attrs="{'readonly': [('stage_id', '=', 4)]}"/>
+                        <field name="probability" attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
                     </xpath>
                     <xpath expr="//field[@name='partner_id']" position="after">
                         <field name="teli_company_name"/>
@@ -146,52 +146,67 @@
                             </group>
                             <group string="Qualification Questions" name="qualifications" col="4">
                                 <label for="monthly_usage" colspan="3"/>
-                                <field name="monthly_usage" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="monthly_usage" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="number_of_dids" colspan="3"/>
-                                <field name="number_of_dids" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="number_of_dids" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="potential" colspan="3"/>
-                                <field name="potential" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="potential" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="current_service" colspan="3"/>
-                                <field name="current_service" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="current_service" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="under_contract" colspan="3"/>
-                                <field name="under_contract" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="under_contract" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="valid_use_case" colspan="3"/>
-                                <field name="valid_use_case" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="valid_use_case" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="use_case_explanation" colspan="3"/>
-                                <field name="use_case_explanation" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="use_case_explanation" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="share_rates" colspan="3"/>
-                                <field name="share_rates" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="share_rates" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="buying_motivation" colspan="3"/>
-                                <field name="buying_motivation" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="buying_motivation" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="decision_maker" colspan="3"/>
-                                <field name="decision_maker" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="decision_maker" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
                             </group>
                             <group string="Qualified Technical Compatibility" col="4">
                                 <label for="current_messaging_platform" colspan="3"/>
-                                <field name="current_messaging_platform" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="current_messaging_platform" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="interface_preference" colspan="3"/>
-                                <field name="interface_preference" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="interface_preference" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="voice_config" colspan="3"/>
-                                <field name="voice_config" colspan="1" nolabel="1" readonly="1"/>
+                                <field name="voice_config" colspan="1" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <separator colspan="4"/>
 
                                 <label for="customizations" colspan="1"/>
-                                <field name="customizations" colspan="3" nolabel="1" readonly="1"/>
+                                <field name="customizations" colspan="3" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
 
                                 <label for="known_issues" colspan="1"/>
-                                <field name="known_issues" colspan="3" nolabel="1" readonly="1"/>
+                                <field name="known_issues" colspan="3" nolabel="1"
+                                    attrs="{'readonly': ['|', ('stage_id', '=', 4), ('stage_id', '=', 5)]}"/>
                             </group>
                         </page>
                     </xpath>

@@ -268,17 +268,20 @@ class teli_crm(models.Model):
                 float(self.potential[1:])
             else:
                 float(self.potential)
+
+            if self.type == 'opportunity':
+                self.planned_revenue = self.potential if self.potential[0] != '$' else self.potential[1:]
         except ValueError:
             raise ValidationError('"What is the potential revenue per month?" must be a numeric value.')
 
     @api.multi
     @api.constrains('offnet_dids')
     def _enable_offnet_dids(self):
-        teliapi = self.env['teliapi.teliapi']
-        current_user = self._get_current_user()
         _logger.debug('offnet_dids is: %s' % self.offnet_dids)
 
         if self.offnet_dids:
+            teliapi = self.env['teliapi.teliapi']
+            current_user = self._get_current_user()
             result = teliapi.enable_offnet_dids({
                 'user_id': self.teli_user_id,
                 'token': current_user.teli_token
