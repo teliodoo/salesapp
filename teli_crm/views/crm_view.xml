@@ -27,7 +27,7 @@
                                 <field name="account_credit"/>
                                 <field name="inbound_channel_limit"/>
                                 <field name="outbound_channel_limit"/>
-                                <field name="offnet_dids"/>
+                                <field name="offnet_dids" attrs="{'readonly': [('offnet_dids', '=', True)]}"/>
                                 <field name="international_sms"/>
                                 <field name="usf_exempt"/>
                                 <field name="white_labeling"/>
@@ -134,7 +134,7 @@
                                 <field name="invoice_term"/>
                                 <field name="inbound_channel_limit"/>
                                 <field name="outbound_channel_limit"/>
-                                <field name="offnet_dids"/>
+                                <field name="offnet_dids" attrs="{'readonly': [('offnet_dids', '=', True)]}"/>
                                 <field name="international_sms"/>
                                 <field name="usf_exempt"/>
                                 <field name="white_labeling"/>
@@ -226,7 +226,7 @@
                             <field name="account_credit"/>
                             <field name="inbound_channel_limit"/>
                             <field name="outbound_channel_limit"/>
-                            <field name="offnet_dids"/>
+                            <field name="offnet_dids" attrs="{'readonly': [('offnet_dids', '=', True)]}"/>
                             <field name="international_sms"/>
                             <field name="usf_exempt"/>
                             <field name="white_labeling"/>
