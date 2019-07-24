@@ -114,3 +114,12 @@ class teliapi(models.Model):
              - token: user's token
         """
         return Teliapi.enable_offnet_dids(params)
+
+    @api.multi
+    def remove_user_account(self, params):
+        """ remove_user_account - attempts to remove the existing user account
+            params:
+             - token
+             - teli_user_id
+        """
+        return Teliapi.remove_user_account(params)

@@ -91,8 +91,8 @@ class teli_crm(models.Model):
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
                                 string="Gateways Needed")
-    month_to_date = fields.Float('Current MTD Total', digits=(13, 2), compute="_calc_month_to_date")
-    prev_mtd = fields.Float('Previous MTD Total', digits=(13, 2), compute="_calc_prev_mtd")
+    month_to_date = fields.Float('Current MTD Total', digits=(13, 2), compute="_calc_month_to_date", store=True)
+    prev_mtd = fields.Float('Previous MTD Total', digits=(13, 2), compute="_calc_prev_mtd", store=True)
 
     def _get_current_user(self):
         # originally i was browsing with self.user_id.id, but that caused API changes to potentially show
@@ -188,7 +188,8 @@ class teli_crm(models.Model):
     # --------------------------------------------------------------------------
     #   Computed
     # --------------------------------------------------------------------------
-    @api.depends()
+    @api.one
+    @api.depends('month_to_date')
     def _calc_month_to_date(self):
         first_day_of_month = datetime.date.today()
         first_day_of_month = first_day_of_month.replace(day=1).__str__()
@@ -203,7 +204,8 @@ class teli_crm(models.Model):
             _logger.debug(' * %s' % agg.total_price)
             self.month_to_date += agg.total_price
 
-    @api.depends()
+    @api.one
+    @api.depends('prev_mtd')
     def _calc_prev_mtd(self):
         first_day_of_month = datetime.date.today().replace(month=datetime.date.today().month-1, day=1).__str__()
         last_day_of_month = (datetime.date.today().replace(day=1) - datetime.timedelta(days=1)).__str__()
@@ -289,6 +291,28 @@ class teli_crm(models.Model):
             if result['code'] is not 200:
                 self.message_post(subject='teli API Warning',
                                   body='<h2>[WARNING] Offnet DIDs Enable</h2><p>%s</p>' % result['data'])
+
+    @api.constrains('stage_id')
+    def _account_status_change(self):
+        _logger.debug('start onchange stage_id [%s]' % self.stage_id.id)
+        # disabled for now, not sure we're ready for this one...
+        if False and self.stage_id.id == 5:
+            teliapi = self.env['teliapi.teliapi']
+            current_user = self._get_current_user()
+            result = teliapi.remove_user_account({
+                'teli_user_id': self.teli_user_id,
+                'token': current_user.teli_token
+            })
+
+            if result['code'] is 200:
+                today = datetime.date.today()
+                # The id of the In-Active stage is 5
+                self.account_status = 'inactive-disabled'
+                self.username = "%s-removed-account-%s" % (self.username, today.strftime("%m-%d-%Y"))
+                self.teli_lead_status = 'dead'
+            else:
+                self.message_post(subject='teli API Warning',
+                                  body='<h2>[WARNING] Account Status Change</h2><p>%s</p>' % result['data'])
 
 
 class TeliProducts(models.Model):

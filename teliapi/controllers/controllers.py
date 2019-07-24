@@ -160,6 +160,15 @@ class Teliapi(http.Controller):
             'user_id': params['user_id']
         })
 
+    @classmethod
+    def remove_user_account(self, params):
+        """ remove_user_account - attempts to remove the existing user account
+        """
+        return self._call('/user/remove', {
+            'token': params['token'],
+            'user_id': params['teli_user_id']
+        })
+
     @http.route('/teliapi/user/get', type='http', auth='user')
     def get_user_direct(self):
         """ get_user_direct - external testing endpoint for get_user
