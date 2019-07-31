@@ -4,6 +4,7 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import logging
 import datetime
+import calendar
 
 _logger = logging.getLogger(__name__)
 # uncomment for debugging
@@ -91,8 +92,12 @@ class teli_crm(models.Model):
                                 string="Product Areas of Inital Use")
     gateways = fields.Many2many('teli.gateways', 'teli_crm_gateways_rel', 'crm_lead_id', 'gateway_id',
                                 string="Gateways Needed")
-    month_to_date = fields.Float('Current MTD Total', digits=(13, 2), compute="_calc_month_to_date", store=True)
-    prev_mtd = fields.Float('Previous MTD Total', digits=(13, 2), compute="_calc_prev_mtd", store=True)
+    month_to_date = fields.Float('Current MTD Total', digits=(13, 2), compute="_calc_month_to_date")
+    prev_mtd = fields.Float('Previous Month Total', digits=(13, 2), compute="_calc_prev_mtd")
+
+    display_curr = fields.Float('Current MTD Total', digits=(13, 2))
+    display_prev = fields.Float('Previous Month Total', digits=(13, 2))
+    mtd_delta = fields.Float('MTD Delta', digits=(13, 2), compute="_calc_mtd_delta")
 
     def _get_current_user(self):
         # originally i was browsing with self.user_id.id, but that caused API changes to potentially show
@@ -200,15 +205,21 @@ class teli_crm(models.Model):
 
         _logger.debug('working with date: %s' % first_day_of_month)
         _logger.debug('count of teli.invoice: %s' % len(ia))
+        temp_value = 0.0
         for agg in ia:
             _logger.debug(' * %s' % agg.total_price)
-            self.month_to_date += agg.total_price
+            temp_value += agg.total_price
+
+        self.month_to_date = temp_value
+        self.display_curr = temp_value
+        # self._calc_mtd_delta()
 
     @api.one
     @api.depends('prev_mtd')
     def _calc_prev_mtd(self):
         first_day_of_month = datetime.date.today().replace(month=datetime.date.today().month-1, day=1).__str__()
         last_day_of_month = (datetime.date.today().replace(day=1) - datetime.timedelta(days=1)).__str__()
+
         _logger.debug('first DOM: %s' % first_day_of_month)
         _logger.debug('last DOM: %s' % last_day_of_month)
 
@@ -219,9 +230,41 @@ class teli_crm(models.Model):
             ('create_dt', '<=', last_day_of_month)
         ])
 
+        temp_value = 0.0
         for agg in ia:
             _logger.debug(' * %s' % agg.total_price)
-            self.prev_mtd += agg.total_price
+            temp_value += agg.total_price
+
+        self.prev_mtd = temp_value
+        self.display_prev = temp_value
+        # self._calc_mtd_delta()
+
+    # @api.one
+    # # @api.onchange('month_to_date')
+    # def _compute_display_curr_total(self):
+    #     _logger.debug('save month_to_date for display')
+    #     self.display_curr = self.month_to_date
+    #
+    # @api.one
+    # # @api.onchange('prev_mtd')
+    # def _compute_display_prev_total(self):
+    #     _logger.debug('save prev_mtd for display')
+    #     self.display_prev = self.prev_mtd
+
+    @api.one
+    @api.depends('month_to_date', 'prev_mtd')
+    def _calc_mtd_delta(self):
+        _logger.debug('================= _calc_mtd_delta ======================')
+        if (self.prev_mtd is 0):
+            self.mtd_delta = 0
+
+        today = datetime.date.today()
+        days_in_current_month = calendar.monthrange(today.year, today.month)[1]
+        try:
+            self.mtd_delta = self.month_to_date - ((self.prev_mtd / today.day) * days_in_current_month)
+            _logger.info('mtd_delta is now: %s' % self.mtd_delta)
+        except ZeroDivisionError:
+            self.mtd_delta = 0
 
     # --------------------------------------------------------------------------
     #   Constrains
@@ -291,28 +334,6 @@ class teli_crm(models.Model):
             if result['code'] is not 200:
                 self.message_post(subject='teli API Warning',
                                   body='<h2>[WARNING] Offnet DIDs Enable</h2><p>%s</p>' % result['data'])
-
-    @api.constrains('stage_id')
-    def _account_status_change(self):
-        _logger.debug('start onchange stage_id [%s]' % self.stage_id.id)
-        # disabled for now, not sure we're ready for this one...
-        if False and self.stage_id.id == 5:
-            teliapi = self.env['teliapi.teliapi']
-            current_user = self._get_current_user()
-            result = teliapi.remove_user_account({
-                'teli_user_id': self.teli_user_id,
-                'token': current_user.teli_token
-            })
-
-            if result['code'] is 200:
-                today = datetime.date.today()
-                # The id of the In-Active stage is 5
-                self.account_status = 'inactive-disabled'
-                self.username = "%s-removed-account-%s" % (self.username, today.strftime("%m-%d-%Y"))
-                self.teli_lead_status = 'dead'
-            else:
-                self.message_post(subject='teli API Warning',
-                                  body='<h2>[WARNING] Account Status Change</h2><p>%s</p>' % result['data'])
 
 
 class TeliProducts(models.Model):

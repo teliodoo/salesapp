@@ -12,6 +12,8 @@
                             <group>
                                 <field name="month_to_date"/>
                                 <field name="prev_mtd"/>
+                                <field name="mtd_delta" attrs="{'invisible': [('mtd_delta', '&lt;', 0.0)]}"/>
+                                <field name="mtd_delta" class="teli_mtd_delta_negative" attrs="{'invisible': [('mtd_delta', '&gt;=', 0.0)]}"/>
                             </group>
                             <field name="invoices">
                                 <tree limit="30">
