@@ -97,7 +97,7 @@ class teli_crm(models.Model):
 
     display_curr = fields.Float('Current MTD Total', digits=(13, 2))
     display_prev = fields.Float('Previous Month Total', digits=(13, 2))
-    mtd_delta = fields.Float('MTD Delta', digits=(13, 2), compute="_calc_mtd_delta")
+    mtd_delta = fields.Float('MTD Pacing', digits=(13, 2), compute="_calc_mtd_delta")
 
     def _get_current_user(self):
         # originally i was browsing with self.user_id.id, but that caused API changes to potentially show
