@@ -95,8 +95,8 @@ class teli_crm(models.Model):
     month_to_date = fields.Float('Current MTD Total', digits=(13, 2), compute="_calc_month_to_date")
     prev_mtd = fields.Float('Previous Month Total', digits=(13, 2), compute="_calc_prev_mtd")
 
-    display_curr = fields.Float('Current MTD Total', digits=(13, 2))
-    display_prev = fields.Float('Previous Month Total', digits=(13, 2))
+    display_curr = fields.Float('Current MTD Total', digits=(13, 2), store=True)
+    display_prev = fields.Float('Previous Month Total', digits=(13, 2), store=True)
     mtd_delta = fields.Float('MTD Pacing', digits=(13, 2), compute="_calc_mtd_delta")
 
     def _get_current_user(self):
@@ -261,7 +261,7 @@ class teli_crm(models.Model):
         today = datetime.date.today()
         days_in_current_month = calendar.monthrange(today.year, today.month)[1]
         try:
-            self.mtd_delta = self.month_to_date - ((self.prev_mtd / today.day) * days_in_current_month)
+            self.mtd_delta = ((self.month_to_date / today.day) * days_in_current_month) - self.prev_mtd
             _logger.info('mtd_delta is now: %s' % self.mtd_delta)
         except ZeroDivisionError:
             self.mtd_delta = 0
