@@ -16,6 +16,26 @@
                     <xpath expr="//label[@for='street']" position="attributes">
                         <attribute name="invisible">1</attribute>
                     </xpath>
+                    <xpath expr="//notebook" position="inside">
+                        <page string="Social Media Information">
+                            <group>
+                                <field name="web_technologies"/>
+                            </group>
+                            <group string="Twitter">
+                                <field name="twitter" widget="url"/>
+                                <field name="twitter_bio"/>
+                            </group>
+                            <group string="Facebook">
+                                <field name="facebook" widget="url"/>
+                                <field name="facebook_notes"/>
+                            </group>
+                            <group string="LinkedIn">
+                                <field name="linkedin" widget="url"/>
+                                <field name="linkedin_bio"/>
+                                <field name="linkedin_notes"/>
+                            </group>
+                        </page>
+                    </xpath>
                 </data>
             </field>
         </record>
