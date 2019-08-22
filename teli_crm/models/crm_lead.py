@@ -96,6 +96,16 @@ class teli_crm(models.Model):
     prev_mtd = fields.Float('Previous Month Total', digits=(13, 2), compute="_calc_prev_mtd", store=True)
     mtd_delta = fields.Float('MTD Pacing', digits=(13, 2), compute="_calc_mtd_delta", store=True)
 
+    # Social Media Information
+    web_technologies = fields.Text('Web Technologies')
+    twitter = fields.Char('Twitter Handle', help="place the full URL in the field")
+    facebook = fields.Char('Facebook Company Page', help="place the full URL in the field")
+    linkedin = fields.Char('LinkedIn Company Page', help="place the full URL in the field")
+    twitter_bio = fields.Text('Twitter Bio')
+    facebook_notes = fields.Text('Facebook Notes')
+    linkedin_notes = fields.Text('LinkedIn Notes')
+    linkedin_bio = fields.Text('LinkedIn Bio')
+
     def _get_current_user(self):
         # originally i was browsing with self.user_id.id, but that caused API changes to potentially show
         # the wrong user made the change.  Going to force the current environment user id going forward.
@@ -248,6 +258,22 @@ class teli_crm(models.Model):
     # --------------------------------------------------------------------------
     #   Constrains
     # --------------------------------------------------------------------------
+    @api.constrains('email_from')
+    def _check_contacts_for_email(self):
+        _logger.warning('inside email check')
+        if not self.email_from:
+            return {}
+
+        contacts = self.env['res.partner'].search_count([
+            ('email', '=', self.email_from)
+        ])
+
+        _logger.info("The current type is %s" % self.type)
+        _logger.info("count of contacts with email is %s" % contacts)
+
+        if self.type == 'lead' and contacts > 0:
+            raise ValidationError("Unable to create lead/contact as email already exists.  To open a new account with an existing contact, create a new opportunity at the contact level.")
+
     @api.multi
     @api.constrains('invoice_term')
     def _set_invoice_term(self):
@@ -317,6 +343,28 @@ class teli_crm(models.Model):
             if result['code'] is not 200:
                 self.message_post(subject='teli API Warning',
                                   body='<h2>[WARNING] Offnet DIDs Enable</h2><p>%s</p>' % result['data'])
+
+    @api.multi
+    @api.constrains('twitter')
+    def _twitter_handle_fix(self):
+        """ The url widget in Odoo demands a fully qualified URL, so this constrains attempts to enforce that rule
+            regardless of the format the user inputs the twitter handle.
+            Side Note: we could take this as an opportunity to auto fill bio and/or follower information, but would
+            have to apply for their API.
+        """
+        # first test for non-values or already fully qualified URLs, and returns if passes
+        if not self.twitter or self.twitter[0:4] == 'http':
+            return True
+
+        # Next check to see if the string starts with "www" (e.g. www.twitter.com/some-company)
+        if self.twitter[0:3] == 'www' or self.twitter[0:11] == 'twitter.com':
+            self.twitter = 'https://' + self.twitter
+        # If the value doesn't start with www, then check for the @ symbol or '/' (the latter probably won't happen)
+        elif self.twitter[0] == '@' or self.twitter[0] == '/':
+            self.twitter = 'https://twitter.com/' + self.twitter[1:]
+        # otherwise, assume the value is the handle and can simply be appended to the twitter domain.
+        else:
+            self.twitter = 'https://twitter.com/' + self.twitter
 
 
 class TeliProducts(models.Model):

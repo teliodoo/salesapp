@@ -85,6 +85,26 @@
                             </group>
                         </page>
                     </xpath>
+                    <xpath expr="//notebook" position="inside">
+                        <page string="Social Media Information">
+                            <group>
+                                <field name="web_technologies"/>
+                            </group>
+                            <group string="Twitter">
+                                <field name="twitter" widget="url"/>
+                                <field name="twitter_bio"/>
+                            </group>
+                            <group string="Facebook">
+                                <field name="facebook" widget="url"/>
+                                <field name="facebook_notes"/>
+                            </group>
+                            <group string="LinkedIn">
+                                <field name="linkedin" widget="url"/>
+                                <field name="linkedin_bio"/>
+                                <field name="linkedin_notes"/>
+                            </group>
+                        </page>
+                    </xpath>
                     <xpath expr="//field[@name='partner_id']" position="attributes">
                         <attribute name="context">{'default_name': contact_name, 'default_function': function, 'default_phone': phone, 'default_mobile': mobile, 'default_email': email_from, 'default_user_id': user_id, 'default_team_id': team_id, 'default_website': website}</attribute>
                     </xpath>

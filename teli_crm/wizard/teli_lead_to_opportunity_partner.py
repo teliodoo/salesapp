@@ -35,10 +35,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
     valid_use_case = fields.Boolean(string='Valid Use Case and Overview of their business model?')
     use_case_explanation = fields.Text(string='What does the company do?')
     share_rates = fields.Boolean(string='Willing to share target rates?')
-    buying_motivation = fields.Selection([
-            ('pain', 'Pain?'),
-            ('gain', 'Gain?')
-        ], 'What\'s the primary motivation for choosing teli?', required=True)
+    buying_motivation = fields.Char('What\'s the primary motivation for choosing teli?', required=True)
     decision_maker = fields.Selection([
             ('decision_maker', 'End Decision Maker'),
             ('influencer', 'Large Influencer'),
@@ -179,6 +176,16 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.voice_config = self.voice_config
         lead.customizations = self.customizations if self.customizations else 'N/A'
         lead.known_issues = self.known_issues if self.known_issues else 'N/A'
+
+        # TODO need to copy the social media data from the lead to the contact.
+        partner.web_technologies = lead.web_technologies
+        partner.twitter = lead.twitter
+        partner.facebook = lead.facebook
+        partner.linkedin = lead.linkedin
+        partner.twitter_bio = lead.twitter_bio
+        partner.facebook_notes = lead.facebook_notes
+        partner.linkedin_bio = lead.linkedin_bio
+        partner.linkedin_notes = lead.linkedin_notes
 
         _logger.debug("body: %s" % body)
         lead.message_post(body=body, subject="Qualification Answers")
