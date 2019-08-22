@@ -178,15 +178,15 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.known_issues = self.known_issues if self.known_issues else 'N/A'
 
         # TODO need to copy the social media data from the lead to the contact.
-        partner_obj = self.env['res.partner'].search([('email', '=', lead.email_from)])
-        partner_obj.web_technologies = lead.web_technologies
-        partner_obj.twitter = lead.twitter
-        partner_obj.facebook = lead.facebook
-        partner_obj.linkedin = lead.linkedin
-        partner_obj.twitter_bio = lead.twitter_bio
-        partner_obj.facebook_notes = lead.facebook_notes
-        partner_obj.linkedin_bio = lead.linkedin_bio
-        partner_obj.linkedin_notes = lead.linkedin_notes
+        # partner_obj = self.env['res.partner'].search([('email', '=', lead.email_from)])
+        # partner_obj.web_technologies = lead.web_technologies
+        # partner_obj.twitter = lead.twitter
+        # partner_obj.facebook = lead.facebook
+        # partner_obj.linkedin = lead.linkedin
+        # partner_obj.twitter_bio = lead.twitter_bio
+        # partner_obj.facebook_notes = lead.facebook_notes
+        # partner_obj.linkedin_bio = lead.linkedin_bio
+        # partner_obj.linkedin_notes = lead.linkedin_notes
 
         _logger.debug("body: %s" % body)
         lead.message_post(body=body, subject="Qualification Answers")
