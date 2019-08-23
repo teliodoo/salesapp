@@ -150,7 +150,7 @@ class teli_lead2opportunity_partner(models.TransientModel):
             raise ValidationError('The Email already exists.  Can\'t create as a new contact.')
 
         # the "potential" constrains has ensured that the value is a number
-        lead.planned_revenue = int(self.potential)
+        lead.planned_revenue = float(self.potential) if self.potential[0] != '$' else float(self.potential[1:])
 
         # set the username before calling signup_user because the lead username constrains needs to be executed first
         lead.username = self.username
@@ -176,17 +176,6 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.voice_config = self.voice_config
         lead.customizations = self.customizations if self.customizations else 'N/A'
         lead.known_issues = self.known_issues if self.known_issues else 'N/A'
-
-        # TODO need to copy the social media data from the lead to the contact.
-        # partner_obj = self.env['res.partner'].search([('email', '=', lead.email_from)])
-        # partner_obj.web_technologies = lead.web_technologies
-        # partner_obj.twitter = lead.twitter
-        # partner_obj.facebook = lead.facebook
-        # partner_obj.linkedin = lead.linkedin
-        # partner_obj.twitter_bio = lead.twitter_bio
-        # partner_obj.facebook_notes = lead.facebook_notes
-        # partner_obj.linkedin_bio = lead.linkedin_bio
-        # partner_obj.linkedin_notes = lead.linkedin_notes
 
         _logger.debug("body: %s" % body)
         lead.message_post(body=body, subject="Qualification Answers")
@@ -263,6 +252,13 @@ class teli_lead2opportunity_partner(models.TransientModel):
     @api.constrains('potential')
     def _valid_potential_value(self):
         try:
-            int(self.potential)
+            # check to see if potential is not empty first.
+            if not self.potential:
+                return True
+
+            if self.potential[0] == '$':
+                float(self.potential[1:])
+            else:
+                float(self.potential)
         except ValueError:
             raise ValidationError('Found non-numeric data in the "What is the potential" answer.')

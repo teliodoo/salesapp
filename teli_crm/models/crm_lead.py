@@ -197,6 +197,24 @@ class teli_crm(models.Model):
         self.skip_constrains_test = True
         return result
 
+    @api.multi
+    def convert_opportunity(self, partner_id, user_ids=False, team_id=False):
+        result = super().convert_opportunity(partner_id, user_ids, team_id)
+
+        # copy over social media data to the contact.
+        if partner_id:
+            customer = self.env['res.partner'].browse(partner_id)
+            customer.web_technologies = self.web_technologies if not customer.web_technologies else customer.web_technologies
+            customer.twitter = self.twitter
+            customer.facebook = self.facebook
+            customer.linkedin = self.linkedin
+            customer.twitter_bio = self.twitter_bio
+            customer.facebook_notes = self.facebook_notes
+            customer.linkedin_bio = self.linkedin_bio
+            customer.linkedin_notes = self.linkedin_notes
+
+        return result
+
     # --------------------------------------------------------------------------
     #   Computed
     # --------------------------------------------------------------------------
