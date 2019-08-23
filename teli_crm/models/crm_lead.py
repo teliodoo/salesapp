@@ -205,13 +205,13 @@ class teli_crm(models.Model):
         if partner_id:
             customer = self.env['res.partner'].browse(partner_id)
             customer.web_technologies = self.web_technologies if not customer.web_technologies else customer.web_technologies
-            customer.twitter = self.twitter
-            customer.facebook = self.facebook
-            customer.linkedin = self.linkedin
-            customer.twitter_bio = self.twitter_bio
-            customer.facebook_notes = self.facebook_notes
-            customer.linkedin_bio = self.linkedin_bio
-            customer.linkedin_notes = self.linkedin_notes
+            customer.twitter = self.twitter if not customer.twitter else customer.twitter
+            customer.facebook = self.facebook if not customer.facebook else customer.facebook
+            customer.linkedin = self.linkedin if not customer.linkedin else customer.linkedin
+            customer.twitter_bio = self.twitter_bio if not customer.twitter_bio else customer.twitter_bio
+            customer.facebook_notes = self.facebook_notes if not customer.facebook_notes else customer.facebook_notes
+            customer.linkedin_bio = self.linkedin_bio if not customer.linkedin_bio else customer.linkedin_bio
+            customer.linkedin_notes = self.linkedin_notes if not customer.linkedin_notes else customer.linkedin_notes
 
         return result
 
