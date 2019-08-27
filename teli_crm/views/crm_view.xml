@@ -150,7 +150,7 @@
                             <group>
                                 <field name="username" readonly="1"/>
                                 <field name="account_credit" readonly="1"/>
-                                <field name="uuid" readonly="1"/>
+                                <!-- <field name="uuid" readonly="1"/> -->
                                 <field name="invoice_term"/>
                                 <field name="inbound_channel_limit"/>
                                 <field name="outbound_channel_limit"/>
