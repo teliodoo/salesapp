@@ -384,6 +384,16 @@ class teli_crm(models.Model):
         else:
             self.twitter = 'https://twitter.com/' + self.twitter
 
+    @api.multi
+    @api.constrains('website')
+    def _website_fix(self):
+        """  If the website value isn't prepended with 'http://' then Odoo will try to use it as an internal link.
+        """
+        if not self.website or self.website[0:4] == 'http':
+            return True
+
+        self.website = 'http://' + self.website
+
 
 class TeliProducts(models.Model):
     _name = 'teli.products'
