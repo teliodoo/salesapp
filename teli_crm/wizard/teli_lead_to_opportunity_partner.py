@@ -155,10 +155,6 @@ class teli_lead2opportunity_partner(models.TransientModel):
         # set the username before calling signup_user because the lead username constrains needs to be executed first
         lead.username = self.username
 
-        # once the lead username constrains checks out, then we can call signup user
-        if not self._call_signup_user():
-            raise ValidationError('An error occurred while attempting to create the user acccount')
-
         # copy the qualification questions back to the lead (the values could have been updated)
         lead.account_credit = self.account_credit
         lead.monthly_usage = self.monthly_usage
@@ -181,41 +177,6 @@ class teli_lead2opportunity_partner(models.TransientModel):
         lead.message_post(body=body, subject="Qualification Answers")
         lead.partner_ids = self.partner_ids
         return super().action_apply()
-
-    def _call_signup_user(self):
-        # make call get data
-        teliapi = self.env['teliapi.teliapi']
-        current_user = self.env['res.users'].browse(self.user_id.id)
-        lead = self.env['crm.lead'].browse(self._context['active_id'])
-
-        # attempt to create the account
-        create_response = teliapi.create_user(
-            current_user.teli_token,
-            lead.contact_name,
-            lead.email_from,
-            lead.mobile if lead.mobile else lead.phone,
-            self.username,
-            self.account_credit,
-            lead.teli_company_name
-        )
-
-        # Check the response and set a note if the call was successful or not
-        if create_response['code'] is not 200:
-            lead.message_post(content_subtype='plaintext', subject='teli API Warning',
-                              body='[WARNING] Received the following error from teli: %s' % create_response['data'])
-            return False
-
-        lead.message_post(content_subtype='plaintext', subject='teli API Note',
-                          body='[SUCCESS] New account was successfully created.')
-
-        # if success, try to grab the uuid and update the oppr/acct
-        user_response = teliapi.find_by_username({
-            'token': current_user.teli_token,
-            'username': self.username
-        })
-        lead.uuid = user_response['auth_token'] if 'auth_token' in user_response else ''
-        lead.teli_user_id = user_response['id'] if 'id' in user_response else ''
-        return True
 
     @api.multi
     @api.onchange('action')

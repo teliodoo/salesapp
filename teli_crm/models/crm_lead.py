@@ -177,10 +177,10 @@ class teli_crm(models.Model):
         self.skip_constrains_test = False
 
         if not self._call_signup_user():
-            raise ValidationError("An error occurred while attempting to create the account.")
+            raise ValidationError("An error occurred while attempting to create the account.  Check the notes for more information.")
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
 
-        result = super().close_dialog()
+        result = super(teli_crm, self).close_dialog()
         self.skip_constrains_test = True
         return result
 
@@ -190,12 +190,23 @@ class teli_crm(models.Model):
         self.skip_constrains_test = False
 
         if not self._call_signup_user():
-            raise ValidationError("An error occurred while attempting to create the account.")
+            raise ValidationError("An error occurred while attempting to create the account.  Check the notes for more information.")
         self.planned_revenue = self.planned_revenue if self.planned_revenue else self.potential
 
-        result = super().edit_dialog()
+        result = super(teli_crm, self).edit_dialog()
         self.skip_constrains_test = True
         return result
+
+    @api.multi
+    def redirect_opportunity_view(self):
+        self.ensure_one()
+        self.skip_constrains_test = False
+
+        if not self._call_signup_user():
+            raise ValidationError("An error occurred while attempting to create the account.  Check the notes for more information.")
+
+        self.skip_constrains_test = True
+        return super(teli_crm, self).redirect_opportunity_view()
 
     @api.multi
     def convert_opportunity(self, partner_id, user_ids=False, team_id=False):
@@ -219,7 +230,7 @@ class teli_crm(models.Model):
     #   Computed
     # --------------------------------------------------------------------------
     @api.one
-    @api.depends('month_to_date', 'invoices.total_price')
+    @api.depends('invoices.total_price')
     def _calc_month_to_date(self):
         _logger.warning('================= _calc_month_to_date ======================')
         first_day_of_month = datetime.date.today()
@@ -239,7 +250,7 @@ class teli_crm(models.Model):
         self.month_to_date = temp_value
 
     @api.one
-    @api.depends('prev_mtd', 'invoices.total_price')
+    @api.depends('invoices.total_price')
     def _calc_prev_mtd(self):
         _logger.warning('================= _calc_prev_mtd ======================')
         first_day_of_month = datetime.date.today().replace(month=datetime.date.today().month-1, day=1).__str__()
